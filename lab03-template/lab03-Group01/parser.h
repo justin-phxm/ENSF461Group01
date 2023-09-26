@@ -15,5 +15,6 @@ bool isvalidascii(const char *inputbuffer, size_t bufferlen);
 int findpipe(const char *inputbuffer, size_t bufferlen);
 bool runinbackground(const char *inputbuffer, size_t bufferlen);
 char * getcommand(const char* inputCommand, char* outputCommand);
+char * firstwordpointer(char* outputbuffer, const char* inputbuffer);
 
 #endif
