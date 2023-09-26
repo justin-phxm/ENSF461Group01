@@ -43,10 +43,13 @@ int main()
             pid_t forkV = fork();
             if (forkV == 0)
             {
-                args[0] = "/usr/bin/echo";
-                args[1] = parsedinput;
+                args[0] = parsedinput;
+                // args[0] = "echo";
+                // args[0] = "/usr/bin/echo";
+                // args[1] = parsedinput;
+                args[1] = NULL;
                 args[2] = NULL;
-                if (execve("/usr/bin/echo", args, NULL) == -1)
+                if (execve(parsedinput, args, NULL) == -1)
                 {
                     fprintf(stderr, "Error running command in execve\n");
                     return -100;
