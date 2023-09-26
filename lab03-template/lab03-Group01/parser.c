@@ -92,6 +92,14 @@ int findpipe(const char* inputbuffer, size_t bufferlen){
 bool runinbackground(const char *inputbuffer, size_t bufferlen)
 {
     // TO DO: Implement this function
+    char str[bufferlen + 1];
+    strncpy(str, inputbuffer, bufferlen);
+    str[bufferlen] = '\0';
+
+    size_t len = strlen(str);
+    if(len > 0 && str[len - 1] == '&'){
+        return true;
+    }
 
     return false;
 }
