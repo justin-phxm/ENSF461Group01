@@ -116,3 +116,18 @@ char * getcommand(const char* inputCommand, char* outputCommand){
     strcat(outputCommand, inputCommand);
     return outputCommand;
 }
+
+char * firstwordpointer(char* outputbuffer, const char* inputbuffer)
+{
+    //TO DO: Implement this function
+    int len = 0;
+    while (inputbuffer[len] && inputbuffer[len] != ' '){
+        len++;
+    }
+    outputbuffer = (char*) malloc(len + 1);
+
+    strcpy(outputbuffer, inputbuffer);
+
+    return outputbuffer;
+}
+
