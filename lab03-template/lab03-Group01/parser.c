@@ -29,10 +29,18 @@ size_t trimstring(char *outputbuffer, const char *inputbuffer, size_t bufferlen)
 //[Input] size_t bufferlen - size of input and output string buffers
 //[Output] char* outputbuffer - output string after trimming
 //[Return] size_t - size of output string after trimming
-size_t firstword(char *outputbuffer, const char *inputbuffer, size_t bufferlen)
+size_t firstword(char* outputbuffer, const char* inputbuffer, size_t bufferlen)
 {
-    // TO DO: Implement this function
-    return 0;
+    //TO DO: Implement this function
+    int len = 0;
+    while (inputbuffer[len] && inputbuffer[len] != ' '){
+        len++;
+    }
+    outputbuffer = (char*) malloc(len + 1);
+
+    strcpy(outputbuffer, inputbuffer);
+
+    return len;
 }
 
 // Command to test that string only contains valid ascii characters (non-control and not extended)
@@ -63,11 +71,17 @@ bool isvalidascii(const char *inputbuffer, size_t bufferlen)
 //[Input] char* inputbuffer - input string to test
 //[Input] size_t bufferlen - size of input buffer
 //[Return] int - location in the string of the pipe character, or -1 pipe character not found
-int findpipe(const char *inputbuffer, size_t bufferlen)
-{
-    // TO DO: Implement this function
-
-    return -1;
+int findpipe(const char* inputbuffer, size_t bufferlen){
+    //TO DO: Implement this function
+    int ind = -1;
+    for (int i = 0; i < bufferlen; i++){
+        if (inputbuffer[i] == '|'){
+            ind = i;
+            break;
+        }
+    }
+    
+    return ind;
 }
 
 // Command to test whether the input string ends with "&" and
