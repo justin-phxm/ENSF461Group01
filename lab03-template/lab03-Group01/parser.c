@@ -95,3 +95,16 @@ bool runinbackground(const char *inputbuffer, size_t bufferlen)
 
     return false;
 }
+
+char * getcommand(const char* inputCommand, char* outputCommand){
+    if (inputCommand && inputCommand[0] == '/'){
+        outputCommand = (char*) malloc(strlen(inputCommand) + 1);
+        strcpy(outputCommand, inputCommand);
+        return outputCommand;
+    }
+    char * binPath = "/usr/bin/";
+    outputCommand = (char*) malloc(strlen(binPath) + strlen(inputCommand) + 1);
+    strcpy(outputCommand, binPath);
+    strcat(outputCommand, inputCommand);
+    return outputCommand;
+}
