@@ -29,14 +29,15 @@ size_t trimstring(char *outputbuffer, const char *inputbuffer, size_t bufferlen)
 //[Input] size_t bufferlen - size of input and output string buffers
 //[Output] char* outputbuffer - output string after trimming
 //[Return] size_t - size of output string after trimming
-size_t firstword(char* outputbuffer, const char* inputbuffer, size_t bufferlen)
+size_t firstword(char *outputbuffer, const char *inputbuffer, size_t bufferlen)
 {
-    //TO DO: Implement this function
+    // TO DO: Implement this function
     int len = 0;
-    while (inputbuffer[len] && inputbuffer[len] != ' '){
+    while (inputbuffer[len] && inputbuffer[len] != ' ')
+    {
         len++;
     }
-    outputbuffer = (char*) malloc(len + 1);
+    outputbuffer = (char *)malloc(len + 1);
 
     strcpy(outputbuffer, inputbuffer);
 
@@ -62,7 +63,7 @@ bool isvalidascii(const char *inputbuffer, size_t bufferlen)
     {
         isValid &= ((unsigned char)inputbuffer[ii] <= '~'); // In (lower) ASCII '~' is the last printable character
         isValid &= ((unsigned char)inputbuffer[ii] >= ' '); // In (lower) ASCII ' ' is the first printable character
-        }
+    }
 
     return isValid;
 }
@@ -71,16 +72,19 @@ bool isvalidascii(const char *inputbuffer, size_t bufferlen)
 //[Input] char* inputbuffer - input string to test
 //[Input] size_t bufferlen - size of input buffer
 //[Return] int - location in the string of the pipe character, or -1 pipe character not found
-int findpipe(const char* inputbuffer, size_t bufferlen){
-    //TO DO: Implement this function
+int findpipe(const char *inputbuffer, size_t bufferlen)
+{
+    // TO DO: Implement this function
     int ind = -1;
-    for (int i = 0; i < bufferlen; i++){
-        if (inputbuffer[i] == '|'){
+    for (int i = 0; i < bufferlen; i++)
+    {
+        if (inputbuffer[i] == '|')
+        {
             ind = i;
             break;
         }
     }
-    
+
     return ind;
 }
 
@@ -97,37 +101,41 @@ bool runinbackground(const char *inputbuffer, size_t bufferlen)
     str[bufferlen] = '\0';
 
     size_t len = strlen(str);
-    if(len > 0 && str[len - 1] == '&'){
+    if (len > 0 && str[len - 1] == '&')
+    {
         return true;
     }
 
     return false;
 }
 
-char * getcommand(const char* inputCommand, char* outputCommand){
-    if (inputCommand && inputCommand[0] == '/'){
-        outputCommand = (char*) malloc(strlen(inputCommand) + 1);
+char *getcommand(const char *inputCommand)
+{
+    char *outputCommand;
+    if (inputCommand && inputCommand[0] == '/')
+    {
+        outputCommand = (char *)malloc(strlen(inputCommand) + 1);
         strcpy(outputCommand, inputCommand);
         return outputCommand;
     }
-    char * binPath = "/usr/bin/";
-    outputCommand = (char*) malloc(strlen(binPath) + strlen(inputCommand) + 1);
+    char *binPath = "/usr/bin/";
+    outputCommand = (char *)malloc(strlen(binPath) + strlen(inputCommand) + 1);
     strcpy(outputCommand, binPath);
     strcat(outputCommand, inputCommand);
     return outputCommand;
 }
 
-char * firstwordpointer(char* outputbuffer, const char* inputbuffer)
+char *firstwordpointer(char *outputbuffer, const char *inputbuffer)
 {
-    //TO DO: Implement this function
+    // TO DO: Implement this function
     int len = 0;
-    while (inputbuffer[len] && inputbuffer[len] != ' '){
+    while (inputbuffer[len] && inputbuffer[len] != ' ')
+    {
         len++;
     }
-    outputbuffer = (char*) malloc(len + 1);
+    outputbuffer = (char *)malloc(len + 1);
 
     strcpy(outputbuffer, inputbuffer);
 
     return outputbuffer;
 }
-
