@@ -125,17 +125,50 @@ char *getcommand(const char *inputCommand)
     return outputCommand;
 }
 
-char *firstwordpointer(char *outputbuffer, const char *inputbuffer)
+char *firstwordpointer(const char *inputbuffer)
 {
-    // TO DO: Implement this function
+    if (!inputbuffer)
+        return NULL; // handle NULL input
+
     int len = 0;
     while (inputbuffer[len] && inputbuffer[len] != ' ')
     {
         len++;
     }
-    outputbuffer = (char *)malloc(len + 1);
 
-    strcpy(outputbuffer, inputbuffer);
+    char *outputbuffer = (char *)malloc(len + 1);
+    if (!outputbuffer)
+        return NULL; // handle memory allocation failure
+
+    strncpy(outputbuffer, inputbuffer, len); // copy only the first word
+    outputbuffer[len] = '\0';
+
+    return outputbuffer;
+}
+
+char *argsstringpointer(const char *inputbuffer)
+{
+    if (!inputbuffer)
+        return NULL; // handle NULL input
+
+    int len = 0;
+    while (inputbuffer[len] && inputbuffer[len] != ' ')
+    {
+        len++;
+    }
+
+    // Check if the found character is space and move to the next character
+    if (inputbuffer[len] == ' ')
+    {
+        len++;
+    }
+
+    const char *temp = &inputbuffer[len];
+    char *outputbuffer = (char *)malloc(strlen(temp) + 1);
+    if (!outputbuffer)
+        return NULL; // handle memory allocation failure
+
+    strcpy(outputbuffer, temp);
 
     return outputbuffer;
 }
