@@ -17,5 +17,6 @@ bool runinbackground(const char *inputbuffer, size_t bufferlen);
 char *getcommand(const char *inputCommand);
 char *firstwordpointer(const char *inputbuffer);
 char *argsstringpointer(const char *inputbuffer);
+char** parseInput(const char* input, int* argCount);
 
 #endif

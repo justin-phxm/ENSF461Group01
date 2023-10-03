@@ -45,13 +45,16 @@ int main()
             {
                 char *command = firstwordpointer(parsedinput);
                 char *absolutePathCommand = getcommand(command);
+                int argCount = 0;
+                char **args_p = parseInput(parsedinput, &argCount);
                 args[0] = command;
                 // args[0] = "echo";
                 // args[0] = "/usr/bin/echo";
                 // args[1] = parsedinput;
-                args[1] = "Hello WOrld";
-                args[2] = NULL;
-                if (execve(absolutePathCommand, args, NULL) == -1)
+
+                args[1] = args_p[1];
+                // args[2] = NULL;
+                if (execve(absolutePathCommand, args_p, NULL) == -1)
                 {
                     fprintf(stderr, "Error running command in execve\n");
                     return -100;
