@@ -104,12 +104,16 @@ void policy_FIFO(const struct job *head ) {
   char *data[sizeLinkedList + 2];
   char myTemp[100];
   snprintf(myTemp, sizeof(myTemp), "Execution trace with FIFO:\n ");
+  data[0] = myTemp;
   for(struct job *curr = head; curr != NULL; curr = curr->next){
     char temp[100]; // Assuming a maximum length for the string
     snprintf(temp, sizeof(temp), "t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", curr->arrival, curr->id, curr->arrival, curr->length);
     data[curr->id + 1] = temp;
     printf("%s", data[curr->id]);
   }
+  snprintf(myTemp, sizeof(myTemp), "End of execution with FIFO.\n ");
+
+  data[sizeLinkedList + 2] = myTemp;
   // write(data, 1);
   return;
 }
