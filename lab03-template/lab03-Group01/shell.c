@@ -7,14 +7,10 @@
 
 #define BUFLEN 1024
 
-// To Do: This base file has been provided to help you start the lab, you'll need to heavily modify it to implement all of the features
-
 int main()
 {
-    char buffer[1024];
+    char buffer[BUFLEN];
     char *parsedinput;
-    char *args[3];
-    char newline;
 
     printf("Welcome to the Group01 shell! Enter commands, enter 'quit' to exit\n");
     do
@@ -36,32 +32,69 @@ int main()
         if (strcmp(parsedinput, "quit") == 0)
         {
             printf("Bye!!\n");
+            free(parsedinput);
             return 0;
         }
-        else
-        {
-            pid_t forkV = fork();
-            if (forkV == 0)
-            {
-                char *command = firstwordpointer(parsedinput);
-                char *absolutePathCommand = getcommand(command);
-                int argCount = 0;
-                char **args_p = parseInput(parsedinput, &argCount);
-                args[0] = command;
-                // args[0] = "echo";
-                // args[0] = "/usr/bin/echo";
-                // args[1] = parsedinput;
+        
+        pid_t forkV = fork();
+        if (forkV == 0) {
+            int argCount = 0;
+            char **args_p = parseInput(parsedinput, &argCount);
 
-                args[1] = args_p[1];
-                // args[2] = NULL;
-                if (execve(absolutePathCommand, args_p, NULL) == -1)
-                {
-                    fprintf(stderr, "Error running command in execve\n");
-                    return -100;
+            // Check for pipes
+            int isPipe = 0;
+            int pipePos = -1;
+            for (int i = 0; i < argCount; i++) {
+                if (strcmp(args_p[i], "|") == 0) {
+                    isPipe = 1;
+                    pipePos = i;
+                    break;
                 }
             }
-            else
-                wait(NULL);
+
+            if (isPipe) {
+                int fd[2];  // file descriptors for the pipe
+                if (pipe(fd) == -1) {
+                    perror("pipe");
+                    exit(-1);
+                }
+
+                pid_t pid = fork();
+                if (pid == 0) {  // First command in child
+                    close(fd[0]); // Close read end
+                    dup2(fd[1], STDOUT_FILENO);  // Redirect stdout to the pipe
+                    close(fd[1]);
+
+                    args_p[pipePos] = NULL;  // terminate the list of arguments for the first command
+                    char *absolutePathCommand1 = getcommand(args_p[0]);
+                    if (execve(absolutePathCommand1, args_p, NULL) == -1) {
+                        fprintf(stderr, "Error running first command in execve\n");
+                        exit(-100);
+                    }
+                } else {
+                    wait(NULL);  // Wait for first command to complete
+
+                    close(fd[1]);  // Close write end
+                    dup2(fd[0], STDIN_FILENO);  // Redirect stdin to get input from the pipe
+                    close(fd[0]);
+
+                    char *absolutePathCommand2 = getcommand(args_p[pipePos + 1]);
+                    if (execve(absolutePathCommand2, &args_p[pipePos + 1], NULL) == -1) {
+                        fprintf(stderr, "Error running second command in execve\n");
+                        exit(-100);
+                    }
+                }
+            } else {
+                char *command = firstwordpointer(parsedinput);
+                char *absolutePathCommand = getcommand(command);
+
+                if (execve(absolutePathCommand, args_p, NULL) == -1) {
+                    fprintf(stderr, "Error running command in execve\n");
+                    exit(-100);
+                }
+            }
+        } else {
+            wait(NULL);
         }
 
         // Remember to free any memory you allocate!
