@@ -148,7 +148,7 @@ char *firstwordpointer(const char *inputbuffer)
 
 char *argsstringpointer(const char *inputbuffer)
 {
-    if (!inputbuffer)
+    if (!inputbuffer || strlen(inputbuffer) == 0)
         return NULL; // handle NULL input
 
     int len = 0;
@@ -171,4 +171,88 @@ char *argsstringpointer(const char *inputbuffer)
     strcpy(outputbuffer, temp);
 
     return outputbuffer;
+}
+
+char** parseInput(const char* input, int* argCount)
+{
+    *argCount = 0;
+    int length = strlen(input);
+    bool inQuote = false;
+    bool newArg = true;
+    char currentQuoteChar = '\0'; // to keep track of ' or "
+
+    for (int i = 0; i < length; i++)
+    {
+        if (input[i] == ' ' && !inQuote)
+        {
+            newArg = true;
+        }
+        else if ((input[i] == '"' || input[i] == '\'') && (currentQuoteChar == input[i] || currentQuoteChar == '\0'))
+        {
+            inQuote = !inQuote;
+            currentQuoteChar = inQuote ? input[i] : '\0';  // Set or reset current quote char
+        }
+        else if (newArg)
+        {
+            (*argCount)++;
+            newArg = false;
+        }
+    }
+
+    char** args = (char **)malloc((*argCount + 1) * sizeof(char *));
+    int start = 0;
+    int argIndex = 0;
+    newArg = true;
+    inQuote = false;
+    currentQuoteChar = '\0';  // Reset current quote char for second loop
+
+    for (int i = 0; i < length; i++)
+    {
+        if (input[i] == ' ' && !inQuote)
+        {
+            if (!newArg)
+            {
+                int len = i - start;
+                args[argIndex] = (char*)malloc((len + 1) * sizeof(char));
+                strncpy(args[argIndex], &input[start], len);
+                args[argIndex][len] = '\0'; 
+                argIndex++;
+            }
+            newArg = true;
+        }
+        else if ((input[i] == '"' || input[i] == '\'') && (currentQuoteChar == input[i] || currentQuoteChar == '\0'))
+        {
+            inQuote = !inQuote;
+            currentQuoteChar = inQuote ? input[i] : '\0';
+            if (inQuote)
+            {
+                start = i + 1;
+            }
+            else
+            {
+                int len = i - start;
+                args[argIndex] = (char*)malloc((len + 1) * sizeof(char));
+                strncpy(args[argIndex], &input[start], len);
+                args[argIndex][len] = '\0'; 
+                argIndex++;
+                newArg = true;
+            }
+        }
+        else if (newArg)
+        {
+            start = i;
+            newArg = false;
+        }
+    }
+
+    // Handle the last argument if the loop ended without copying it
+    if (!newArg)
+    {
+        int len = length - start;
+        args[argIndex] = (char*)malloc((len + 1) * sizeof(char));
+        strncpy(args[argIndex], &input[start], len);
+        args[argIndex][len] = '\0';
+    }
+
+    return args;
 }
