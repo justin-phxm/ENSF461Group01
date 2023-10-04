@@ -71,6 +71,7 @@ int main()
                         fprintf(stderr, "Error running first command in execve\n");
                         exit(-100);
                     }
+                    free(absolutePathCommand1);
                 } else {
                     wait(NULL);  // Wait for first command to complete
 
@@ -83,6 +84,7 @@ int main()
                         fprintf(stderr, "Error running second command in execve\n");
                         exit(-100);
                     }
+                    free(absolutePathCommand2);
                 }
             } else {
                 char *command = firstwordpointer(parsedinput);
@@ -92,12 +94,20 @@ int main()
                     fprintf(stderr, "Error running command in execve\n");
                     exit(-100);
                 }
+                free(command);
+                free(absolutePathCommand);
             }
+            for (int i = 0; i < argCount; i++) {
+                free(args_p[i]);
+            }
+            free(args_p);
+
         } else {
             wait(NULL);
         }
 
         // Remember to free any memory you allocate!
+        
         free(parsedinput);
     } while (1);
 
