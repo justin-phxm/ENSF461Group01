@@ -111,18 +111,43 @@ bool runinbackground(const char *inputbuffer, size_t bufferlen)
 
 char *getcommand(const char *inputCommand)
 {
-    char *outputCommand;
-    if (inputCommand && inputCommand[0] == '/')
-    {
-        outputCommand = (char *)malloc(strlen(inputCommand) + 1);
-        strcpy(outputCommand, inputCommand);
-        return outputCommand;
+    char *path = getenv("PATH");  // get the PATH enivronment variable
+    // check if PATH is set
+    if (path == NULL) {
+        fprintf(stderr, "PATH environment variable is not set.\n");
+        return NULL;
     }
-    char *binPath = "/usr/bin/";
-    outputCommand = (char *)malloc(strlen(binPath) + strlen(inputCommand) + 1);
-    strcpy(outputCommand, binPath);
-    strcat(outputCommand, inputCommand);
-    return outputCommand;
+
+    char *token;
+    char *searchPath = strdup(path); // make a copy of the PATH variable
+    char *fullPath = (char *)malloc(BUFLEN); 
+    
+    if (fullPath == NULL) {
+        fprintf(stderr, "Memory allocation error.\n");
+        free(searchPath);
+        return NULL;
+    }
+
+    // tokenize the PATH variable using ':' as the delimiter
+    token = strtok(searchPath, ":");
+    while (token != NULL) {
+        // construct the full path to the command
+        snprintf(fullPath, BUFLEN, "%s/%s", token, inputCommand);
+
+        // check if the command is executable
+        if (access(fullPath, X_OK) == 0) {
+            free(searchPath);
+            return fullPath;
+        }
+
+        // iterate to the next token
+        token = strtok(NULL, ":");
+    }
+
+    // if the command is not found, return NULL
+    free(searchPath);
+    free(fullPath);
+    return NULL;
 }
 
 char *firstwordpointer(const char *inputbuffer)
