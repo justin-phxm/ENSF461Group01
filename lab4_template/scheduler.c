@@ -11,6 +11,7 @@ struct job
   int id;
   int arrival;
   int length;
+  int isChecked;
   struct job *next;
 };
 
@@ -32,6 +33,7 @@ void append(int id, int arrival, int length)
   tmp->id = id;
   tmp->length = length;
   tmp->arrival = arrival;
+  tmp->isChecked = 0;
 
   // the new job is the last job
   tmp->next = NULL;
@@ -56,59 +58,6 @@ void append(int id, int arrival, int length)
   return;
 }
 
-void appendNewNode(struct job *head, int id, int arrival, int length)
-{
-  struct job *newNode = (struct job *)malloc(sizeof(struct job));
-  newNode->id = id;
-  newNode->arrival = arrival;
-  newNode->length = length;
-  newNode->next = NULL;
-
-  struct job *current = head;
-  while (current->next != NULL)
-  {
-    current = current->next;
-  }
-  current->next = newNode;
-  return;
-}
-
-struct job *duplicateList(struct job *head)
-{
-  struct job *newHead = NULL;
-  struct job *current = head;
-  while (current != NULL)
-  {
-    appendNewNode(newHead, current->id, current->arrival, current->length);
-    current = current->next;
-  }
-  return newHead;
-}
-
-void removeNode(struct job *head, int id)
-{
-  struct job *current = head;
-  struct job *prev = NULL;
-  while (current != NULL)
-  {
-    if (current->id == id)
-    {
-      if (prev == NULL)
-      {
-        head = current->next;
-      }
-      else
-      {
-        prev->next = current->next;
-      }
-      free(current);
-      return;
-    }
-    prev = current;
-    current = current->next;
-  }
-}
-
 /*Function to read in the workload file and create job list*/
 void read_workload_file(char *filename)
 {
@@ -119,8 +68,6 @@ void read_workload_file(char *filename)
   char *line = NULL,
        *arrival = NULL,
        *length = NULL;
-
-  struct job **head_ptr = malloc(sizeof(struct job *));
 
   if ((fp = fopen(filename, "r")) == NULL)
     exit(EXIT_FAILURE);
@@ -145,7 +92,7 @@ void read_workload_file(char *filename)
   return;
 }
 
-void policy_FIFO(const struct job *head)
+void policy_FIFO(struct job *head)
 {
   // iterate through linked list and add to data array
   int time = 0;
@@ -159,7 +106,7 @@ void policy_FIFO(const struct job *head)
   return;
 }
 
-void analyze_FIFO(const struct job *head)
+void analyze_FIFO(struct job *head)
 {
   printf("Begin analyzing FIFO:\n ");
   int startTime = 0;
@@ -198,23 +145,42 @@ void analyze_FIFO(const struct job *head)
   printf("End analyzing FIFO.\n ");
 }
 
-void policy_SJF(const struct job *head)
+void policy_SJF()
 {
-  printf("Execution trace with SJF:\n ");
+  printf("Execution trace with SJF:\n");
   int time = 0;
-  for (struct job *curr = head; curr != NULL; curr = curr->next)
+  struct job *curr;
+  struct job *shortestJob = head;
+  int nextArrivalTime = 0;
+  for (int i = 0; i < count; i++)
   {
-
-    if (curr->arrival > time)
+    curr = head->next;
+    shortestJob = head;
+    while (curr)
     {
-      time = curr->arrival;
+      if ((curr->arrival <= time) && (curr->length < shortestJob->length) && (curr->isChecked == 0))
+      {
+        shortestJob = curr;
+        if (curr->next != NULL)
+        {
+          nextArrivalTime = curr->next->arrival;
+        }
+      }
+      curr = curr->next;
     }
-    printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
-    time += curr->length;
+
+    printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, shortestJob->length);
+    time += shortestJob->length;
+    if (time < nextArrivalTime)
+    {
+      time = nextArrivalTime;
+    }
+    shortestJob->isChecked = 1;
   }
-  printf("nd of execution with SJF.\n ");
+  printf("End of execution with SJF.\n ");
 }
-void analyze_SJF(const struct job *head)
+
+void analyze_SJF(struct job *head)
 {
   char *data[count];
   printf("Begin analyzing SJF:\n ");
@@ -260,58 +226,10 @@ void analyze_SJF(const struct job *head)
   for (int j = count - 1; j >= 0; j--)
   {
     printf("%s", data[j]);
+    free(data[j]);
   }
   printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", (double)responseSum / count, (double)turnaroundSum / count, (double)waitSum / count);
   printf("End analyzing SJF.\n ");
-
-  // free memory
-  for (int j = 0; j < count; j++)
-  {
-    free(data[j]);
-  }
-  free(data);
-}
-
-struct job *createNewNode(int id, int arrival, int length)
-{
-  struct job *newNode = (struct job *)malloc(sizeof(struct job));
-  newNode->id = id;
-  newNode->arrival = arrival;
-  newNode->length = length;
-  newNode->next = NULL;
-  return newNode;
-}
-
-struct job *insertionSortByLength(struct job *head)
-{
-  if (!head)
-    return NULL;
-
-  struct job *head2 = duplicateList(head);
-  struct job *sorted = NULL; // Create a new list for sorted jobs
-  struct job *current;
-  struct job *nextShortestJob;
-  struct job newJob;
-  int time = 0;
-
-  for (int i = 0; i < count; i++)
-  {
-    current = head2->next;
-    nextShortestJob = head2;
-    while (current)
-    {
-      if ((current->arrival <= time && current->length < nextShortestJob->length) || (current->arrival < nextShortestJob->arrival))
-      {
-        nextShortestJob = current;
-      }
-      current = current->next;
-    }
-    time += nextShortestJob->length;
-    newJob = *nextShortestJob;
-    appendNewNode(sorted, newJob.id, newJob.arrival, newJob.length);
-    removeNode(head2, newJob.id);
-  }
-  return sorted;
 }
 
 int main(int argc, char **argv)
@@ -351,14 +269,14 @@ int main(int argc, char **argv)
   }
   if (strcmp(policy, "SJF") == 0)
   {
-    struct job *tmp;
-    printf("Begin execution with SJF:\n ");
-    tmp = insertionSortByLength(head);
-    printf("End of execution with SJF.\n ");
-    policy_SJF(tmp);
+    // for (struct job *curr = head; curr != NULL; curr = curr->next)
+    // {
+    //   printf("Job %d -- arrival: %d length: %d\n", curr->id, curr->arrival, curr->length);
+    // }
+    policy_SJF();
     if (analysis)
     {
-      analyze_SJF(tmp);
+      analyze_SJF(head);
     }
 
     // free memory
@@ -369,19 +287,9 @@ int main(int argc, char **argv)
       free(curr);
       curr = temp; // Move to the next node
     }
-    curr = tmp;
-
-    while (curr != NULL)
-    {
-      struct job *temp = curr->next; // Store the next node before freeing the current one
-      free(curr);
-      curr = temp; // Move to the next node
-    }
 
     exit(EXIT_SUCCESS);
   }
-
-  // TODO: Add other policies
 
   exit(EXIT_SUCCESS);
 }
