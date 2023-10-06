@@ -56,6 +56,59 @@ void append(int id, int arrival, int length)
   return;
 }
 
+void appendNewNode(struct job *head, int id, int arrival, int length)
+{
+  struct job *newNode = (struct job *)malloc(sizeof(struct job));
+  newNode->id = id;
+  newNode->arrival = arrival;
+  newNode->length = length;
+  newNode->next = NULL;
+
+  struct job *current = head;
+  while (current->next != NULL)
+  {
+    current = current->next;
+  }
+  current->next = newNode;
+  return;
+}
+
+struct job *duplicateList(struct job *head)
+{
+  struct job *newHead = NULL;
+  struct job *current = head;
+  while (current != NULL)
+  {
+    appendNewNode(newHead, current->id, current->arrival, current->length);
+    current = current->next;
+  }
+  return newHead;
+}
+
+void removeNode(struct job *head, int id)
+{
+  struct job *current = head;
+  struct job *prev = NULL;
+  while (current != NULL)
+  {
+    if (current->id == id)
+    {
+      if (prev == NULL)
+      {
+        head = current->next;
+      }
+      else
+      {
+        prev->next = current->next;
+      }
+      free(current);
+      return;
+    }
+    prev = current;
+    current = current->next;
+  }
+}
+
 /*Function to read in the workload file and create job list*/
 void read_workload_file(char *filename)
 {
@@ -90,16 +143,6 @@ void read_workload_file(char *filename)
   assert(id > 0);
 
   return;
-}
-
-// if overwriteflag is 1, then overwrite the file
-// if overwriteflag is 0, then append to the file
-void display(char **data)
-{
-  for (int i = 0; i < count; i++)
-  {
-    printf("%s\n", data[i]);
-  }
 }
 
 void policy_FIFO(const struct job *head)
@@ -244,32 +287,29 @@ struct job *insertionSortByLength(struct job *head)
   if (!head)
     return NULL;
 
+  struct job *head2 = duplicateList(head);
   struct job *sorted = NULL; // Create a new list for sorted jobs
-  struct job *current = head;
+  struct job *current;
+  struct job *nextShortestJob;
+  struct job newJob;
+  int time = 0;
 
-  while (current)
+  for (int i = 0; i < count; i++)
   {
-    struct job *newNode = createNewNode(current->id, current->arrival, current->length);
-
-    if (!sorted || (newNode->arrival != sorted->arrival && newNode->arrival < sorted->arrival) ||
-        (newNode->arrival == sorted->arrival && newNode->length < sorted->length))
+    current = head2->next;
+    nextShortestJob = head2;
+    while (current)
     {
-      newNode->next = sorted;
-      sorted = newNode;
-    }
-    else
-    {
-      struct job *currentSorted = sorted;
-      while (currentSorted->next &&
-             (currentSorted->next->arrival < newNode->arrival ||
-              (currentSorted->next->arrival == newNode->arrival && currentSorted->next->length < newNode->length)))
+      if ((current->arrival <= time && current->length < nextShortestJob->length) || (current->arrival < nextShortestJob->arrival))
       {
-        currentSorted = currentSorted->next;
+        nextShortestJob = current;
       }
-      newNode->next = currentSorted->next;
-      currentSorted->next = newNode;
+      current = current->next;
     }
-    current = current->next;
+    time += nextShortestJob->length;
+    newJob = *nextShortestJob;
+    appendNewNode(sorted, newJob.id, newJob.arrival, newJob.length);
+    removeNode(head2, newJob.id);
   }
   return sorted;
 }
@@ -312,7 +352,9 @@ int main(int argc, char **argv)
   if (strcmp(policy, "SJF") == 0)
   {
     struct job *tmp;
+    printf("Begin execution with SJF:\n ");
     tmp = insertionSortByLength(head);
+    printf("End of execution with SJF.\n ");
     policy_SJF(tmp);
     if (analysis)
     {
