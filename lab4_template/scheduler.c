@@ -151,30 +151,32 @@ void policy_SJF()
   int time = 0;
   struct job *curr;
   struct job *shortestJob = head;
-  int nextArrivalTime = 0;
   for (int i = 0; i < count; i++)
   {
-    curr = head->next;
+    // move curr and shortestJob to next job where isChecked == 0
+    curr = head;
     shortestJob = head;
+    while (curr && (curr->isChecked != 0))
+    {
+      curr = curr->next;
+      shortestJob = curr;
+      if (time < curr->arrival)
+      {
+        time = curr->arrival;
+      }
+    }
+
     while (curr)
     {
       if ((curr->arrival <= time) && (curr->length < shortestJob->length) && (curr->isChecked == 0))
       {
         shortestJob = curr;
-        if (curr->next != NULL)
-        {
-          nextArrivalTime = curr->next->arrival;
-        }
       }
       curr = curr->next;
     }
 
     printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, shortestJob->length);
     time += shortestJob->length;
-    if (time < nextArrivalTime)
-    {
-      time = nextArrivalTime;
-    }
     shortestJob->isChecked = 1;
   }
   printf("End of execution with SJF.\n ");
@@ -269,10 +271,6 @@ int main(int argc, char **argv)
   }
   if (strcmp(policy, "SJF") == 0)
   {
-    // for (struct job *curr = head; curr != NULL; curr = curr->next)
-    // {
-    //   printf("Job %d -- arrival: %d length: %d\n", curr->id, curr->arrival, curr->length);
-    // }
     policy_SJF();
     if (analysis)
     {
