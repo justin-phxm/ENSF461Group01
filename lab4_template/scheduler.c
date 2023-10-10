@@ -12,6 +12,7 @@ struct job
   int arrival;
   int length;
   int isChecked;
+  int startTime;
   struct job *next;
 };
 
@@ -20,8 +21,43 @@ int seed = 100;
 
 // This is the start of our linked list of jobs, i.e., the job list
 struct job *head = NULL;
+struct job *head2 = NULL;
 static int count = 0;
 /*** Globals End ***/
+
+void append2(int id, int arrival, int length, int startTime)
+{
+  // create a new struct and initialize it with the input data
+  struct job *tmp = (struct job *)malloc(sizeof(struct job));
+
+  tmp->id = id;
+  tmp->length = length;
+  tmp->arrival = arrival;
+  tmp->isChecked = 0;
+  tmp->startTime = startTime;
+
+  // the new job is the last job
+  tmp->next = NULL;
+
+  // Case: job is first to be added, linked list is empty
+  if (head2 == NULL)
+  {
+    head2 = tmp;
+    return;
+  }
+
+  struct job *prev = head2;
+
+  // Find end of list
+  while (prev->next != NULL)
+  {
+    prev = prev->next;
+  }
+
+  // Add job to end of list
+  prev->next = tmp;
+  return;
+}
 
 /*Function to append a new job to the list*/
 void append(int id, int arrival, int length)
@@ -29,7 +65,6 @@ void append(int id, int arrival, int length)
   // create a new struct and initialize it with the input data
   struct job *tmp = (struct job *)malloc(sizeof(struct job));
 
-  // tmp->id = numofjobs++;
   tmp->id = id;
   tmp->length = length;
   tmp->arrival = arrival;
@@ -160,7 +195,10 @@ void policy_SJF()
     {
       curr = curr->next;
       shortestJob = curr;
-      if (time < curr->arrival)
+
+      // wait for idle time
+      // could be problematic if curr is NULL
+      if (curr->arrival && time < curr->arrival)
       {
         time = curr->arrival;
       }
@@ -176,16 +214,23 @@ void policy_SJF()
     }
 
     printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, shortestJob->length);
+    append2(shortestJob->id, shortestJob->arrival, shortestJob->length, time);
     time += shortestJob->length;
     shortestJob->isChecked = 1;
   }
-  printf("End of execution with SJF.\n ");
+  printf("End of execution with SJF.\n");
+  // reset isChecked back to 0
+  for (struct job *curr = head; curr != NULL; curr = curr->next)
+  {
+    curr->isChecked = 0;
+  }
 }
 
 void analyze_SJF(struct job *head)
 {
   char *data[count];
-  printf("Begin analyzing SJF:\n ");
+  printf("Begin analyzing SJF:\n");
+
   int startTime = 0;
   int arrivalTime = 0;
   int completionTime = 0;
@@ -197,19 +242,16 @@ void analyze_SJF(struct job *head)
   int turnaroundSum = 0;
   int waitSum = 0;
 
-  int time = 0;
-
   // add to data array
-  int i = 0;
   for (struct job *curr = head; curr != NULL; curr = curr->next)
   {
     // calculate reponseTime
     arrivalTime = curr->arrival;
-    startTime = time;
+    startTime = curr->startTime;
     responseTime = startTime - arrivalTime;
 
     // calculate turnaroundTime
-    completionTime = time + curr->length;
+    completionTime = startTime + curr->length;
     turnaroundTime = completionTime - arrivalTime;
 
     // calculate waitTime
@@ -217,21 +259,20 @@ void analyze_SJF(struct job *head)
     char temp[100];
 
     snprintf(temp, sizeof(temp), "Job %d -- Response time: %d Turnaround: %d Wait: %d\n", curr->id, responseTime, turnaroundTime, waitTime);
-    data[i] = strdup(temp);
-    time += curr->length;
+    data[curr->id] = strdup(temp);
     responseSum += responseTime;
     turnaroundSum += turnaroundTime;
     waitSum += waitTime;
-    i++;
   }
-  // for loop to print array in reverse
-  for (int j = count - 1; j >= 0; j--)
+  // print array
+  for (int j = 0; j < count; j++)
   {
     printf("%s", data[j]);
     free(data[j]);
   }
   printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", (double)responseSum / count, (double)turnaroundSum / count, (double)waitSum / count);
-  printf("End analyzing SJF.\n ");
+
+  printf("End analyzing SJF.\n");
 }
 
 int main(int argc, char **argv)
@@ -274,7 +315,7 @@ int main(int argc, char **argv)
     policy_SJF();
     if (analysis)
     {
-      analyze_SJF(head);
+      analyze_SJF(head2);
     }
 
     // free memory
@@ -285,7 +326,14 @@ int main(int argc, char **argv)
       free(curr);
       curr = temp; // Move to the next node
     }
-
+    // free head2
+    curr = head2;
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
+    }
     exit(EXIT_SUCCESS);
   }
 
