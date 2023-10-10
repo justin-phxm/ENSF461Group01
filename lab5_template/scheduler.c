@@ -11,7 +11,10 @@ struct job
   int id;
   int arrival;
   int length;
+  int isChecked;
   int tickets;
+  int startTime;
+  int remainingTime;
   struct job *next;
 };
 
@@ -20,6 +23,8 @@ int seed = 100;
 
 // This is the start of our linked list of jobs, i.e., the job list
 struct job *head = NULL;
+struct job *head2 = NULL;
+static int count = 0;
 
 /*** Globals End ***/
 
@@ -34,6 +39,8 @@ void append(int id, int arrival, int length, int tickets)
   tmp->length = length;
   tmp->arrival = arrival;
   tmp->tickets = tickets;
+  tmp->isChecked = 0;
+  tmp->remainingTime = length;
 
   // the new job is the last job
   tmp->next = NULL;
@@ -85,6 +92,7 @@ void read_workload_file(char *filename)
     assert(arrival != NULL && length != NULL);
 
     append(id++, atoi(arrival), atoi(length), tickets);
+    count++;
   }
 
   fclose(fp);
@@ -95,10 +103,54 @@ void read_workload_file(char *filename)
   return;
 }
 
+int get_total_runtime(struct job *head)
+{
+  int total = 0;
+  struct job *curr = head;
+  while (curr != NULL)
+  {
+    total += curr->length;
+    curr = curr->next;
+  }
+  return total;
+}
+
 void policy_STCF(struct job *head, int slice)
 {
-  // TODO: Fill this in
+  printf("Execution trace with STCF:\n");
+  struct job *shortestJob = head;
+  int completeJobs = 0, minM = INT_MAX, time = 0;
+  while (completeJobs != count)
+  {
+    for (struct job *curr = head; curr != NULL; curr = curr->next)
+    {
+      if (curr->arrival <= time && curr->remainingTime < minM && curr->isChecked == 0)
+      {
+        minM = curr->remainingTime;
+        shortestJob = curr;
+      }
+    }
+    shortestJob->remainingTime -= slice;
+    minM = shortestJob->remainingTime;
+    if (minM <= 0)
+    {
+      minM = INT_MAX;
+    }
+    if (shortestJob->remainingTime <= 0)
+    {
+      completeJobs++;
+      shortestJob->isChecked = 1;
+    }
+    int runTime = slice;
+    if (shortestJob->remainingTime < slice)
+    {
+      runTime = slice - shortestJob->remainingTime;
+    }
+    printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, runTime);
+    time += slice;
+  }
 
+  printf("End of execution with STCF.\n");
   return;
 }
 
@@ -107,6 +159,107 @@ void analyze_STCF(struct job *head)
   // TODO: Fill this in
 
   return;
+}
+
+void policy_RR(struct job *head, int slice)
+{
+  printf("Execution trace with RR:\n");
+  int total_runtime = get_total_runtime(head);
+  struct job *curr = head;
+  int time = 0;
+
+  while (total_runtime > 0)
+  {
+    if (curr->arrival > time)
+    {
+      time = curr->arrival;
+    }
+    int temp = curr->length - slice;
+    if (temp > 0)
+    {
+      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+      curr->length = temp;
+      total_runtime -= slice;
+      time += slice;
+    }
+    else
+    {
+      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+      total_runtime -= curr->length;
+      time += curr->length;
+      if (curr->next != NULL && curr->next->arrival <= time)
+      {
+        curr = curr->next;
+      }
+      else
+      {
+        curr = head;
+      }
+    }
+  }
+
+  printf("End of execution with RR.\n");
+}
+
+void analyze_RR(struct job *head)
+{
+  // TODO: Fill this in
+}
+
+void policy_LT(struct job *head, int slice)
+{
+  printf("Execution trace with LT:\n");
+
+  int time = 0;
+
+  while (head != NULL)
+  {
+    // calculate the total number of tickets
+    int totalTickets = 0;
+    struct job *curr = head;
+    while (curr != NULL)
+    {
+      totalTickets += curr->tickets;
+      curr = curr->next;
+    }
+
+    // generate a random number between 0 and totalTickets
+    int winningTicket = rand() % totalTickets + 1;
+
+    // find the job with the winning ticket by traversing the list until the winning ticket is found
+    struct job *curr2 = head;
+    while (curr2 != NULL)
+    {
+      winningTicket -= curr2->tickets;
+      if (curr2 <= 0)
+      {
+        if (curr2->length > slice)
+        {
+          printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+          curr2->length -= slice;
+          time += slice;
+        }
+        else
+        {
+          printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+          time += curr->length;
+          curr2->length = 0;
+          curr2->isChecked = 1;
+        }
+      }
+
+      // remove the job from the list if it has finished executing
+      if (curr2->length == 0)
+      {
+            }
+    }
+  }
+
+  printf("End of execution with LT.\n");
+}
+
+void analyze_LT(struct job *head)
+{
 }
 
 int main(int argc, char **argv)
@@ -137,6 +290,14 @@ int main(int argc, char **argv)
       analyze_STCF(head);
       printf("End analyzing STCF.\n");
     }
+    struct job *curr = head;
+    // free memory
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
+    }
 
     exit(EXIT_SUCCESS);
   }
@@ -151,6 +312,14 @@ int main(int argc, char **argv)
       analyze_RR(head);
       printf("End analyzing RR.\n");
     }
+    // free memory
+    struct job *curr = head;
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
+    }
 
     exit(EXIT_SUCCESS);
   }
@@ -162,6 +331,14 @@ int main(int argc, char **argv)
       printf("Begin analyzing LT:\n");
       analyze_LT(head);
       printf("End analyzing LT.\n");
+    }
+    // free memory
+    struct job *curr = head;
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
     }
 
     exit(EXIT_SUCCESS);
