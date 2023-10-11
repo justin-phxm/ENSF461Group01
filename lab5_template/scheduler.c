@@ -14,7 +14,14 @@ struct job
   int isChecked;
   int tickets;
   int startTime;
+  int startFlag;
   int remainingTime;
+
+  int completionTime;
+  int responseTime;
+  int turnaroundTime;
+  int waitTime;
+
   struct job *next;
 };
 
@@ -41,6 +48,7 @@ void append(int id, int arrival, int length, int tickets)
   tmp->tickets = tickets;
   tmp->isChecked = 0;
   tmp->remainingTime = length;
+  tmp->startFlag = 0;
 
   // the new job is the last job
   tmp->next = NULL;
@@ -120,31 +128,45 @@ void policy_STCF(struct job *head, int slice)
   printf("Execution trace with STCF:\n");
   struct job *shortestJob = head;
   int completeJobs = 0, minM = INT_MAX, time = 0;
+  // iterate through linked list and add to data array
   while (completeJobs != count)
   {
     for (struct job *curr = head; curr != NULL; curr = curr->next)
     {
+      // find the shortest job that has arrived
       if (curr->arrival <= time && curr->remainingTime < minM && curr->isChecked == 0)
       {
         minM = curr->remainingTime;
         shortestJob = curr;
       }
     }
+
+    // update shortestJob startTime
+    if (shortestJob->startFlag == 0)
+    {
+      shortestJob->startTime = time;
+      shortestJob->startFlag = 1;
+    }
+
     shortestJob->remainingTime -= slice;
     minM = shortestJob->remainingTime;
     if (minM <= 0)
     {
       minM = INT_MAX;
     }
+    int runTime = slice;
+    // might not be necessary... Since time is in slices, we can just add the remaining time
+    if (shortestJob->remainingTime < slice)
+    {
+      runTime = slice - shortestJob->remainingTime;
+    }
+    // if it is necessary, then completionTime = time + runTime
     if (shortestJob->remainingTime <= 0)
     {
       completeJobs++;
       shortestJob->isChecked = 1;
-    }
-    int runTime = slice;
-    if (shortestJob->remainingTime < slice)
-    {
-      runTime = slice - shortestJob->remainingTime;
+      shortestJob->completionTime = time + slice;
+      // printf("[Job %d] shortestJob->completionTime: %d\n", shortestJob->id, shortestJob->completionTime);
     }
     printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, runTime);
     time += slice;
@@ -157,6 +179,48 @@ void policy_STCF(struct job *head, int slice)
 void analyze_STCF(struct job *head)
 {
   // TODO: Fill this in
+  char *data[count];
+
+  // int startTime = 0;
+  int arrivalTime = 0;
+  // int completionTime = 0;
+  int responseTime = 0;
+  int turnaroundTime = 0;
+  int waitTime = 0;
+
+  int responseSum = 0;
+  int turnaroundSum = 0;
+  int waitSum = 0;
+
+  // add to data array
+  for (struct job *curr = head; curr != NULL; curr = curr->next)
+  {
+    // calculate reponseTime
+    arrivalTime = curr->arrival;
+    // startTime = curr->startTime;
+    responseTime = curr->startTime - arrivalTime;
+
+    // calculate turnaroundTime
+    // completionTime = startTime + curr->length;
+    turnaroundTime = curr->completionTime - arrivalTime;
+
+    // calculate waitTime
+    waitTime = turnaroundTime - curr->length;
+    char temp[100];
+
+    snprintf(temp, sizeof(temp), "Job %d -- Response time: %d Turnaround: %d Wait: %d\n", curr->id, responseTime, turnaroundTime, waitTime);
+    data[curr->id] = strdup(temp);
+    responseSum += responseTime;
+    turnaroundSum += turnaroundTime;
+    waitSum += waitTime;
+  }
+  // print array
+  for (int j = 0; j < count; j++)
+  {
+    printf("%s", data[j]);
+    free(data[j]);
+  }
+  printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", (double)responseSum / count, (double)turnaroundSum / count, (double)waitSum / count);
 
   return;
 }
@@ -251,7 +315,7 @@ void policy_LT(struct job *head, int slice)
       // remove the job from the list if it has finished executing
       if (curr2->length == 0)
       {
-            }
+      }
     }
   }
 
