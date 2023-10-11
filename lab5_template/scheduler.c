@@ -18,9 +18,9 @@ struct job
   int remainingTime;
 
   int completionTime;
-  int responseTime;
-  int turnaroundTime;
-  int waitTime;
+  // int responseTime;
+  // int turnaroundTime;
+  // int waitTime;
 
   struct job *next;
 };
@@ -178,11 +178,10 @@ void policy_STCF(struct job *head, int slice)
 
 void analyze_STCF(struct job *head)
 {
-  // TODO: Fill this in
   char *data[count];
 
   // int startTime = 0;
-  int arrivalTime = 0;
+  // int arrivalTime = 0;
   // int completionTime = 0;
   int responseTime = 0;
   int turnaroundTime = 0;
@@ -196,13 +195,13 @@ void analyze_STCF(struct job *head)
   for (struct job *curr = head; curr != NULL; curr = curr->next)
   {
     // calculate reponseTime
-    arrivalTime = curr->arrival;
+    // arrivalTime = curr->arrival;
     // startTime = curr->startTime;
-    responseTime = curr->startTime - arrivalTime;
+    responseTime = curr->startTime - curr->arrival;
 
     // calculate turnaroundTime
     // completionTime = startTime + curr->length;
-    turnaroundTime = curr->completionTime - arrivalTime;
+    turnaroundTime = curr->completionTime - curr->arrival;
 
     // calculate waitTime
     waitTime = turnaroundTime - curr->length;
