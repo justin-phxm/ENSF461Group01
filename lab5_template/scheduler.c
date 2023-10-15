@@ -111,6 +111,49 @@ void read_workload_file(char *filename)
   return;
 }
 
+struct job* createJobNode(struct job* originalJob) {
+    // Allocate memory for the new node
+    struct job* newJob = (struct job*)malloc(sizeof(struct job));
+    if (newJob == NULL) {
+        printf("Error allocating memory for new node.\n");
+        exit(-1); // Handle memory allocation errors
+    }
+
+    // Copy the data from the original job
+    *newJob = *originalJob; // This copies the data of the struct
+
+    // Set the 'next' pointer of the new node to NULL, it will be set properly in the deep copy function
+    newJob->next = NULL;
+
+    return newJob;
+}
+
+struct job* deepCopyLinkedList(struct job* head) {
+    if (head == NULL) {
+        return NULL; // If the original list is empty, return NULL
+    }
+
+    // Create a new head node for the new list
+    struct job* newHead = createJobNode(head);
+    struct job* currentOriginal = head->next;
+    struct job* currentNew = newHead;
+
+    // Loop through the original list
+    while (currentOriginal != NULL) {
+        // Create a new node with the same data as the current node
+        struct job* newJob = createJobNode(currentOriginal);
+
+        // Append the new node to the new list
+        currentNew->next = newJob;
+
+        // Move to the next node in the lists
+        currentNew = currentNew->next;
+        currentOriginal = currentOriginal->next;
+    }
+
+    return newHead; // Return the head of the deep-copied list
+}
+
 int get_total_runtime(struct job *head)
 {
   int total = 0;
@@ -374,6 +417,33 @@ int main(int argc, char **argv)
 
   // TODO: Add other policies
   if (strcmp(policy, "RR") == 0)
+  {
+    struct job * copy = deepCopyLinkedList(head);
+    policy_RR(copy, slice);
+    if (analysis)
+    {
+      printf("Begin analyzing RR:\n");
+      analyze_RR(copy);
+      printf("End analyzing RR.\n");
+    }
+    // free memory
+    struct job *curr = head;
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
+    }
+    curr = copy;
+    while (curr != NULL)
+    {
+      struct job *temp = curr->next; // Store the next node before freeing the current one
+      free(curr);
+      curr = temp; // Move to the next node
+    }
+
+    exit(EXIT_SUCCESS);
+  }
   {
     policy_RR(head, slice);
     if (analysis)
