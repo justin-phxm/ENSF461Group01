@@ -280,21 +280,26 @@ void policy_RR(struct job *head, int slice)
     {
       time = curr->arrival;
     }
-    int temp = curr->length - slice;
+    if (curr-> startFlag == 0){
+      curr->startTime = time;
+      curr->startFlag = 1;
+    }
+    int temp = curr->remainingTime - slice;
     if (temp > 0)
     {
       printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, slice);
-      curr->length = temp;
+      curr->remainingTime = temp;
       total_runtime -= slice;
       time += slice;
     }
     else
     {
-      if (curr->length > 0){
-        printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
-        total_runtime -= curr->length;
-        time += curr->length;
-        curr->length = 0;
+      if (curr->remainingTime > 0){
+        printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->remainingTime);
+        total_runtime -= curr->remainingTime;
+        time += curr->remainingTime;
+        curr->remainingTime = 0;
+        curr->completionTime = time;
       }
 
     }
@@ -305,7 +310,7 @@ void policy_RR(struct job *head, int slice)
       else
       {
         curr = head;
-        while (curr != NULL && curr->length == 0){
+        while (curr != NULL && curr->remainingTime == 0){
           curr = curr->next;
         }
       }
@@ -316,7 +321,32 @@ void policy_RR(struct job *head, int slice)
 
 void analyze_RR(struct job *head)
 {
-  // TODO: Fill this in
+  
+  double responseSum = 0;
+  double turnaroundSum = 0;
+  double waitSum = 0;
+
+  struct job *curr = head;
+  while (curr != NULL)
+  {
+    int responseTime = curr->startTime - curr->arrival;
+    int turnaroundTime = curr->completionTime - curr->arrival;
+    int waitTime = turnaroundTime - curr->length;
+
+    responseSum += responseTime;
+    turnaroundSum += turnaroundTime;
+    waitSum += waitTime;
+
+    printf("Job %d -- Response time: %d Turnaround: %d Wait: %d\n", curr->id, responseTime, turnaroundTime, waitTime);
+    curr = curr->next;
+  }
+  responseSum /= count;
+  turnaroundSum /= count;
+  waitSum /= count;
+
+  printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", responseSum, turnaroundSum, waitSum);
+
+
 }
 
 void policy_LT(struct job *head, int slice)
