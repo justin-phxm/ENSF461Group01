@@ -240,16 +240,21 @@ void policy_RR(struct job *head, int slice)
     int temp = curr->length - slice;
     if (temp > 0)
     {
-      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, slice);
       curr->length = temp;
       total_runtime -= slice;
       time += slice;
     }
     else
     {
-      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
-      total_runtime -= curr->length;
-      time += curr->length;
+      if (curr->length > 0){
+        printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
+        total_runtime -= curr->length;
+        time += curr->length;
+        curr->length = 0;
+      }
+
+    }
       if (curr->next != NULL && curr->next->arrival <= time)
       {
         curr = curr->next;
@@ -257,8 +262,10 @@ void policy_RR(struct job *head, int slice)
       else
       {
         curr = head;
+        while (curr != NULL && curr->length == 0){
+          curr = curr->next;
+        }
       }
-    }
   }
 
   printf("End of execution with RR.\n");
