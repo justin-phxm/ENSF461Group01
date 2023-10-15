@@ -382,6 +382,12 @@ void policy_LT(struct job *head, int slice)
       winner = winner->next;
     }
 
+    if (winner->startFlag == 0)
+    {
+      winner->startTime = t;
+      winner->startFlag = 1;
+    }
+
     // update total_tickets
     int temp = winner->remainingTime - slice;
     if (temp > 0)
@@ -405,7 +411,13 @@ void policy_LT(struct job *head, int slice)
 
 void analyze_LT(struct job *head)
 {
+  double responseSum = 0;
+  double turnaroundSum = 0;
+  double waitSum = 0;
+
+  struct job *curr = head;
 }
+
 
 int main(int argc, char **argv)
 {
