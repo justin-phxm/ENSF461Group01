@@ -416,6 +416,25 @@ void analyze_LT(struct job *head)
   double waitSum = 0;
 
   struct job *curr = head;
+  while(curr != NULL)
+  {
+    int responseTime = curr->startTime - curr->arrival;
+    int turnaroundTime = curr->completionTime - curr->arrival;
+    int waitTime = turnaroundTime - curr->length;
+
+    responseSum += responseTime;
+    turnaroundSum += turnaroundTime;
+    waitSum += waitTime;
+
+    printf("Job %d -- Response time: %d Turnaround: %d Wait: %d\n", curr->id, responseTime, turnaroundTime, waitTime);
+    curr = curr->next;
+  }
+
+  responseSum /= count;
+  turnaroundSum /= count;
+  waitSum /= count;
+
+  printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", responseSum, turnaroundSum, waitSum);
 }
 
 
