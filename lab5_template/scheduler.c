@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 
 // TODO: Add more fields to this struct
 struct job
@@ -352,49 +353,50 @@ void analyze_RR(struct job *head)
 void policy_LT(struct job *head, int slice)
 {
   printf("Execution trace with LT:\n");
+  struct job *curr = head;
+  int t = 0;
+  int total_runtime = get_total_runtime(head);
+  int total_tickets = 0;
 
-  int time = 0;
+  // seed the random number generator
+  srand(time(NULL));
 
-  while (head != NULL)
+  while (total_runtime > 0)
   {
-    // calculate the total number of tickets
-    int totalTickets = 0;
-    struct job *curr = head;
-    while (curr != NULL)
+    if (curr->arrival && curr->arrival > t)
     {
-      totalTickets += curr->tickets;
-      curr = curr->next;
+      t = curr->arrival;
     }
 
-    // generate a random number between 0 and totalTickets
-    int winningTicket = rand() % totalTickets + 1;
+    // generate random ticket
+    int winning_ticket = (rand() % total_tickets) + 1;
+    int ticket_counter = 0;
 
-    // find the job with the winning ticket by traversing the list until the winning ticket is found
-    struct job *curr2 = head;
-    while (curr2 != NULL)
+    // find the winner by iterating through the linked list
+    struct job *winner = head;
+    while (winner != NULL) {
+      ticket_counter += winner->tickets;
+      if (ticket_counter > winning_ticket) {
+        break;
+      }
+      winner = winner->next;
+    }
+
+    // update total_tickets
+    int temp = winner->remainingTime - slice;
+    if (temp > 0)
     {
-      winningTicket -= curr2->tickets;
-      if (curr2 <= 0)
-      {
-        if (curr2->length > slice)
-        {
-          printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
-          curr2->length -= slice;
-          time += slice;
-        }
-        else
-        {
-          printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->length);
-          time += curr->length;
-          curr2->length = 0;
-          curr2->isChecked = 1;
-        }
-      }
-
-      // remove the job from the list if it has finished executing
-      if (curr2->length == 0)
-      {
-      }
+      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", t, winner->id, winner->arrival, slice);
+      winner->remainingTime = temp;
+      total_runtime -= slice;
+      t += slice;
+    }
+    else
+    {
+      printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", t, winner->id, winner->arrival, winner->remainingTime);
+      total_runtime -= winner->remainingTime;
+      t += winner->remainingTime;
+      winner->remainingTime = 0;
     }
   }
 
