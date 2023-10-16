@@ -507,25 +507,6 @@ int main(int argc, char **argv)
 
     exit(EXIT_SUCCESS);
   }
-  {
-    policy_RR(head, slice);
-    if (analysis)
-    {
-      printf("Begin analyzing RR:\n");
-      analyze_RR(head);
-      printf("End analyzing RR.\n");
-    }
-    // free memory
-    struct job *curr = head;
-    while (curr != NULL)
-    {
-      struct job *temp = curr->next; // Store the next node before freeing the current one
-      free(curr);
-      curr = temp; // Move to the next node
-    }
-
-    exit(EXIT_SUCCESS);
-  }
   if (strcmp(policy, "LT") == 0)
   {
     policy_LT(head, slice);
