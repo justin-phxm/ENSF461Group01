@@ -430,6 +430,7 @@ void policy_LT(struct job *head, int slice)
     else
     {
       printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", t, winner->id, winner->arrival, winner->remainingTime);
+      winner->completionTime = t + winner->remainingTime;
       total_runtime -= winner->remainingTime;
       t += winner->remainingTime;
       winner->remainingTime = 0;
