@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 
 // TODO: Add more fields to this struct
 struct job
@@ -356,6 +357,8 @@ void policy_LT(struct job *head, int slice)
   int t = 0;
   int total_runtime = get_total_runtime(head);
 
+  srand(time(NULL));
+
   // assign tickets to each job
   struct job *temp = head;
   while (temp != NULL)
@@ -383,13 +386,13 @@ void policy_LT(struct job *head, int slice)
     // generate random ticket
     int winning_ticket = (rand() % total_tickets) + 1;
     int ticket_counter = 0;
-
     // find the winner by iterating through the linked list
     struct job *winner = head;
     while (winner != NULL) {
       // skip the job if it has finished
       // if the job has finished and there is another job, move on to the next job
       if (winner->remainingTime == 0 && winner->next != NULL){
+        ticket_counter += winner->tickets;
         winner = winner->next;
         continue;
       }
