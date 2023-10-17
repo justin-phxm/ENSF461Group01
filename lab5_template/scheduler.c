@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
-#include <time.h>
 
 // TODO: Add more fields to this struct
 struct job
@@ -356,16 +355,29 @@ void policy_LT(struct job *head, int slice)
   struct job *curr = head;
   int t = 0;
   int total_runtime = get_total_runtime(head);
-  int total_tickets = 0;
 
-  // seed the random number generator
-  srand(time(NULL));
+  // assign tickets to each job
+  struct job *temp = head;
+  while (temp != NULL)
+  {
+    temp->tickets = seed;
+    temp = temp->next;
+  }
 
   while (total_runtime > 0)
   {
     if (curr->arrival && curr->arrival > t)
     {
       t = curr->arrival;
+    }
+
+    // calculate total tickets
+    struct job *ptr = head;
+    int total_tickets = 0;
+    while (ptr != NULL && ptr->arrival <= t)
+    {
+      total_tickets += ptr->tickets;
+      ptr = ptr->next;
     }
 
     // generate random ticket
@@ -375,11 +387,29 @@ void policy_LT(struct job *head, int slice)
     // find the winner by iterating through the linked list
     struct job *winner = head;
     while (winner != NULL) {
-      ticket_counter += winner->tickets;
-      if (ticket_counter > winning_ticket) {
-        break;
+      // skip the job if it has finished
+      // if the job has finished and there is another job, move on to the next job
+      if (winner->remainingTime == 0 && winner->next != NULL){
+        winner = winner->next;
+        continue;
       }
-      winner = winner->next;
+      // if the last job has finished, reset the ticket counter and generate
+      // a new winning ticket
+      else if(winner->remainingTime == 0 && winner->next == NULL){
+        winning_ticket = (rand() % total_tickets) + 1;
+        ticket_counter = 0;
+        winner = head;
+        continue;
+      }
+      // if the job has not finished, add its tickets to the ticket counter
+      // and check if it is the winner
+      else{
+        ticket_counter += winner->tickets;
+        if (ticket_counter > winning_ticket) {
+          break;
+        }
+        winner = winner->next; 
+      }
     }
 
     if (winner->startFlag == 0)
