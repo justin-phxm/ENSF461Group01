@@ -112,47 +112,52 @@ void read_workload_file(char *filename)
   return;
 }
 
-struct job* createJobNode(struct job* originalJob) {
-    // Allocate memory for the new node
-    struct job* newJob = (struct job*)malloc(sizeof(struct job));
-    if (newJob == NULL) {
-        printf("Error allocating memory for new node.\n");
-        exit(-1); // Handle memory allocation errors
-    }
+struct job *createJobNode(struct job *originalJob)
+{
+  // Allocate memory for the new node
+  struct job *newJob = (struct job *)malloc(sizeof(struct job));
+  if (newJob == NULL)
+  {
+    printf("Error allocating memory for new node.\n");
+    exit(-1); // Handle memory allocation errors
+  }
 
-    // Copy the data from the original job
-    *newJob = *originalJob; // This copies the data of the struct
+  // Copy the data from the original job
+  *newJob = *originalJob; // This copies the data of the struct
 
-    // Set the 'next' pointer of the new node to NULL, it will be set properly in the deep copy function
-    newJob->next = NULL;
+  // Set the 'next' pointer of the new node to NULL, it will be set properly in the deep copy function
+  newJob->next = NULL;
 
-    return newJob;
+  return newJob;
 }
 
-struct job* deepCopyLinkedList(struct job* head) {
-    if (head == NULL) {
-        return NULL; // If the original list is empty, return NULL
-    }
+struct job *deepCopyLinkedList(struct job *head)
+{
+  if (head == NULL)
+  {
+    return NULL; // If the original list is empty, return NULL
+  }
 
-    // Create a new head node for the new list
-    struct job* newHead = createJobNode(head);
-    struct job* currentOriginal = head->next;
-    struct job* currentNew = newHead;
+  // Create a new head node for the new list
+  struct job *newHead = createJobNode(head);
+  struct job *currentOriginal = head->next;
+  struct job *currentNew = newHead;
 
-    // Loop through the original list
-    while (currentOriginal != NULL) {
-        // Create a new node with the same data as the current node
-        struct job* newJob = createJobNode(currentOriginal);
+  // Loop through the original list
+  while (currentOriginal != NULL)
+  {
+    // Create a new node with the same data as the current node
+    struct job *newJob = createJobNode(currentOriginal);
 
-        // Append the new node to the new list
-        currentNew->next = newJob;
+    // Append the new node to the new list
+    currentNew->next = newJob;
 
-        // Move to the next node in the lists
-        currentNew = currentNew->next;
-        currentOriginal = currentOriginal->next;
-    }
+    // Move to the next node in the lists
+    currentNew = currentNew->next;
+    currentOriginal = currentOriginal->next;
+  }
 
-    return newHead; // Return the head of the deep-copied list
+  return newHead; // Return the head of the deep-copied list
 }
 
 int get_total_runtime(struct job *head)
@@ -192,25 +197,20 @@ void policy_STCF(struct job *head, int slice)
       shortestJob->startFlag = 1;
     }
 
+    int runTime = slice;
     shortestJob->remainingTime -= slice;
     minM = shortestJob->remainingTime;
     if (minM <= 0)
     {
+      runTime = slice + minM;
       minM = INT_MAX;
-    }
-    int runTime = slice;
-    // might not be necessary... Since time is in slices, we can just add the remaining time
-    if (shortestJob->remainingTime < slice)
-    {
-      runTime = slice - shortestJob->remainingTime;
-    }
-    // if it is necessary, then completionTime = time + runTime
-    if (shortestJob->remainingTime <= 0)
-    {
-      completeJobs++;
-      shortestJob->isChecked = 1;
-      shortestJob->completionTime = time + slice;
-      // printf("[Job %d] shortestJob->completionTime: %d\n", shortestJob->id, shortestJob->completionTime);
+      shortestJob->remainingTime = 0;
+      if (shortestJob->isChecked == 0)
+      {
+        completeJobs++;
+        shortestJob->isChecked = 1;
+        shortestJob->completionTime = time + runTime;
+      }
     }
     printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, shortestJob->id, shortestJob->arrival, runTime);
     time += slice;
@@ -281,7 +281,8 @@ void policy_RR(struct job *head, int slice)
     {
       time = curr->arrival;
     }
-    if (curr-> startFlag == 0){
+    if (curr->startFlag == 0)
+    {
       curr->startTime = time;
       curr->startFlag = 1;
     }
@@ -295,26 +296,27 @@ void policy_RR(struct job *head, int slice)
     }
     else
     {
-      if (curr->remainingTime > 0){
+      if (curr->remainingTime > 0)
+      {
         printf("t=%d: [Job %d] arrived at [%d], ran for: [%d]\n", time, curr->id, curr->arrival, curr->remainingTime);
         total_runtime -= curr->remainingTime;
         time += curr->remainingTime;
         curr->remainingTime = 0;
         curr->completionTime = time;
       }
-
     }
-      if (curr->next != NULL && curr->next->arrival <= time)
+    if (curr->next != NULL && curr->next->arrival <= time)
+    {
+      curr = curr->next;
+    }
+    else
+    {
+      curr = head;
+      while (curr != NULL && curr->remainingTime == 0)
       {
         curr = curr->next;
       }
-      else
-      {
-        curr = head;
-        while (curr != NULL && curr->remainingTime == 0){
-          curr = curr->next;
-        }
-      }
+    }
   }
 
   printf("End of execution with RR.\n");
@@ -322,7 +324,7 @@ void policy_RR(struct job *head, int slice)
 
 void analyze_RR(struct job *head)
 {
-  
+
   double responseSum = 0;
   double turnaroundSum = 0;
   double waitSum = 0;
@@ -346,8 +348,6 @@ void analyze_RR(struct job *head)
   waitSum /= count;
 
   printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", responseSum, turnaroundSum, waitSum);
-
-
 }
 
 void policy_LT(struct job *head, int slice)
@@ -388,17 +388,20 @@ void policy_LT(struct job *head, int slice)
     int ticket_counter = 0;
     // find the winner by iterating through the linked list
     struct job *winner = head;
-    while (winner != NULL) {
+    while (winner != NULL)
+    {
       // skip the job if it has finished
       // if the job has finished and there is another job, move on to the next job
-      if (winner->remainingTime == 0 && winner->next != NULL){
+      if (winner->remainingTime == 0 && winner->next != NULL)
+      {
         ticket_counter += winner->tickets;
         winner = winner->next;
         continue;
       }
       // if the last job has finished, reset the ticket counter and generate
       // a new winning ticket
-      else if(winner->remainingTime == 0 && winner->next == NULL){
+      else if (winner->remainingTime == 0 && winner->next == NULL)
+      {
         winning_ticket = (rand() % total_tickets) + 1;
         ticket_counter = 0;
         winner = head;
@@ -406,12 +409,14 @@ void policy_LT(struct job *head, int slice)
       }
       // if the job has not finished, add its tickets to the ticket counter
       // and check if it is the winner
-      else{
+      else
+      {
         ticket_counter += winner->tickets;
-        if (ticket_counter > winning_ticket) {
+        if (ticket_counter > winning_ticket)
+        {
           break;
         }
-        winner = winner->next; 
+        winner = winner->next;
       }
     }
 
@@ -450,7 +455,7 @@ void analyze_LT(struct job *head)
   double waitSum = 0;
 
   struct job *curr = head;
-  while(curr != NULL)
+  while (curr != NULL)
   {
     int responseTime = curr->startTime - curr->arrival;
     int turnaroundTime = curr->completionTime - curr->arrival;
@@ -470,7 +475,6 @@ void analyze_LT(struct job *head)
 
   printf("Average -- Response time: %.2f Turnaround: %.2f Wait: %.2f\n", responseSum, turnaroundSum, waitSum);
 }
-
 
 int main(int argc, char **argv)
 {
@@ -515,7 +519,7 @@ int main(int argc, char **argv)
   // TODO: Add other policies
   if (strcmp(policy, "RR") == 0)
   {
-    struct job * copy = deepCopyLinkedList(head);
+    struct job *copy = deepCopyLinkedList(head);
     policy_RR(copy, slice);
     if (analysis)
     {
