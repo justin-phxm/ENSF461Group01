@@ -140,7 +140,7 @@ void *myalloc(size_t size)
 
     header->bwd = NULL;
     fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
-    node_t *allocationStart = (node_t *)((char *)header + sizeof(node_t));
+    node_t *allocationStart = (node_t *)((void *)header + sizeof(node_t));
     fprintf(stderr, "...allocation starts at %p\n", allocationStart);
 
     return allocationStart;
@@ -151,7 +151,7 @@ void myfree(void *ptr)
     fprintf(stderr, "Freeing allocated memory:\n");
     fprintf(stderr, "...supplied pointer %p\n", ptr);
     fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
-    node_t *header = (node_t *)((char *)ptr - sizeof(node_t));
+    node_t *header = (node_t *)((void *)ptr - sizeof(node_t));
     fprintf(stderr, "...accessing chunk header at %p\n", header);
     fprintf(stderr, "...chunk of size %ld\n", header->size);
     fprintf(stderr, "...checking if coalescing is needed\n");
