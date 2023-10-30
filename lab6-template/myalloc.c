@@ -96,10 +96,6 @@ void *myalloc(size_t size)
     fprintf(stderr, "Allocating memory:\n");
     fprintf(stderr, "...looking for free chunk of >= %lu bytes\n", size);
     node_t *header = (node_t *)_arena_start;
-    // fprintf(stderr, "header->is_free: %d\n", header->is_free);
-    // fprintf(stderr, "header->fwd: %p\n", header->fwd);
-    // fprintf(stderr, "header->size: %lu\n", header->size);
-    // fprintf(stderr, "size: %lu\n", size);
     // Move the header pointer to the first free chunk of memory that is large enough.
     while ((header->is_free == 0 || header->size < size))
     {
@@ -152,5 +148,19 @@ void *myalloc(size_t size)
 
 void myfree(void *ptr)
 {
+    fprintf(stderr, "Freeing allocated memory:\n");
+    fprintf(stderr, "...supplied pointer %p\n", ptr);
+    fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
+    node_t *header = (node_t *)((char *)ptr - sizeof(node_t));
+    fprintf(stderr, "...accessing chunk header at %p\n", header);
+    fprintf(stderr, "...chunk of size %ld\n", header->size);
+    fprintf(stderr, "...checking if coalescing is needed\n");
+    // todo: check if coalescing is needed
+    if (1)
+    {
+        fprintf(stderr, "...coalescing is not needed\n");
+    }
+    header->is_free = 1;
+
     return;
 }
