@@ -123,7 +123,7 @@ void *myalloc(size_t size)
     // todo: check if splitting is required
     if (header->size > size + sizeof(node_t))
     {
-        fprintf(stderr, "...splitting is required\n");
+        fprintf(stderr, "...splitting free chunk\n");
     }
     else if (header->size > size)
     {
