@@ -63,6 +63,8 @@ int myinit(size_t size)
     node_t *header = (node_t *)_arena_start;
     header->size = arenaSize - sizeof(node_t);
     header->is_free = 1;
+    header->fwd = NULL;
+    header->bwd = NULL;
     fprintf(stderr, "...header size is 32 bytes\n");
 
     return arenaSize;
@@ -94,8 +96,20 @@ void *myalloc(size_t size)
     fprintf(stderr, "Allocating memory:\n");
     fprintf(stderr, "...looking for free chunk of >= %lu bytes\n", size);
     node_t *header = (node_t *)_arena_start;
-    while (header->is_free == 0 && header->size < size)
+    // fprintf(stderr, "header->is_free: %d\n", header->is_free);
+    // fprintf(stderr, "header->fwd: %p\n", header->fwd);
+    // fprintf(stderr, "header->size: %lu\n", header->size);
+    // fprintf(stderr, "size: %lu\n", size);
+    // Move the header pointer to the first free chunk of memory that is large enough.
+    while ((header->is_free == 0 || header->size < size))
     {
+        if (header->fwd == NULL)
+        {
+            fprintf(stderr, "...no such free chunk exists\n");
+            fprintf(stderr, "...setting error code\n");
+            statusno = ERR_OUT_OF_MEMORY;
+            return NULL;
+        }
         header = header->fwd;
     }
     if (header->size < size)
@@ -115,9 +129,25 @@ void *myalloc(size_t size)
         fprintf(stderr, "...splitting is not required\n");
     }
     fprintf(stderr, "...updating chunk header at %p\n", header);
+    header->is_free = 0;
+    header->size = size;
+    header->fwd = NULL;
+    // if there is space remaining in the arena for another node_t, set the fwd pointer to the next node_t
+    // Calculate the address of the potential next header
+    intptr_t nextHeaderAddress = (intptr_t)header + size + sizeof(node_t);
+
+    // Check if there's enough space for another node_t
+    if (nextHeaderAddress < (intptr_t)_arena_start + arenaSize)
+    {
+        header->fwd = (node_t *)nextHeaderAddress;
+    }
+
+    header->bwd = NULL;
     fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
-    fprintf(stderr, "...allocation starts at %p\n", header + sizeof(node_t));
-    return _arena_start;
+    node_t *allocationStart = (node_t *)((char *)header + sizeof(node_t));
+    fprintf(stderr, "...allocation starts at %p\n", allocationStart);
+
+    return allocationStart;
 }
 
 void myfree(void *ptr)
