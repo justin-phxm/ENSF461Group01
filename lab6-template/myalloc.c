@@ -65,7 +65,7 @@ int myinit(size_t size)
     header->is_free = 1;
     header->fwd = NULL;
     header->bwd = NULL;
-    fprintf(stderr, "...header size is 32 bytes\n");
+    fprintf(stderr, "...header size is %ld bytes\n", sizeof(node_t));
 
     return arenaSize;
 }
@@ -115,30 +115,47 @@ void *myalloc(size_t size)
         statusno = ERR_OUT_OF_MEMORY;
         return NULL;
     }
+    size_t chunkSize = header->size;
     fprintf(stderr, "...found free chunk of %lu bytes with header at %p\n", header->size, header);
     fprintf(stderr, "...free chunk->fwd currently points to %p\n", header->fwd);
     fprintf(stderr, "...free chunk->bwd currently points to %p\n", header->bwd);
     fprintf(stderr, "...checking if splitting is required\n");
     // todo: check if splitting is required
-    if (1)
+    if (header->size > size + sizeof(node_t))
+    {
+        fprintf(stderr, "...splitting is required\n");
+    }
+    else if (header->size > size)
+    {
+        fprintf(stderr, "...splitting not possible\n");
+    }
+    else
     {
         fprintf(stderr, "...splitting is not required\n");
     }
     fprintf(stderr, "...updating chunk header at %p\n", header);
     header->is_free = 0;
     header->size = size;
-    header->fwd = NULL;
+    header->fwd = NULL; // might not need this line...
     // if there is space remaining in the arena for another node_t, set the fwd pointer to the next node_t
     // Calculate the address of the potential next header
     intptr_t nextHeaderAddress = (intptr_t)header + size + sizeof(node_t);
-
     // Check if there's enough space for another node_t
-    if (nextHeaderAddress < (intptr_t)_arena_start + arenaSize)
+    if (nextHeaderAddress + sizeof(node_t) < (intptr_t)_arena_start + arenaSize)
     {
         header->fwd = (node_t *)nextHeaderAddress;
+        node_t *next = header->fwd;
+        next->size = chunkSize - size - sizeof(node_t);
+        next->is_free = 1;
+        next->fwd = NULL; // might not need this line...
+        next->bwd = header;
+    }
+    else
+    {
+        // Fill up the remaining space with the header
+        header->size = chunkSize;
     }
 
-    header->bwd = NULL;
     fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
     node_t *allocationStart = (node_t *)((void *)header + sizeof(node_t));
     fprintf(stderr, "...allocation starts at %p\n", allocationStart);
