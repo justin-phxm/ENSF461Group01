@@ -84,10 +84,32 @@ void *myalloc(size_t size)
 {
     if (_arena_start == NULL)
     {
+        fprintf(stderr, "Error: Unintialized. Setting status code\n");
         statusno = ERR_UNINITIALIZED;
         return NULL;
     }
-    return NULL;
+    fprintf(stderr, "Allocating memory:\n");
+    fprintf(stderr, "...looking for free chunk of >= %lu bytes\n", size);
+    if (size > arenaSize - sizeof(node_t))
+    {
+        fprintf(stderr, "...no such free chunk exists\n");
+        fprintf(stderr, "...setting error code\n");
+        statusno = ERR_OUT_OF_MEMORY;
+        return NULL;
+    }
+    fprintf(stderr, "...found free chunk of %lu bytes with header at %p\n", size, _arena_start);
+    fprintf(stderr, "...free chunk->fwd currently points to (%p)\n", ((node_t *)_arena_start)->fwd);
+    fprintf(stderr, "...free chunk->bwd currently points to (%p)\n", ((node_t *)_arena_start)->bwd);
+    fprintf(stderr, "...checking if splitting is required\n");
+    // todo: check if splitting is required
+    if (1)
+    {
+        fprintf(stderr, "...splitting is not required\n");
+    }
+    fprintf(stderr, "...updating chunk header at %p\n", _arena_start);
+    fprintf(stderr, "...being careful with my pointer arithmetic and void pointer casting\n");
+    fprintf(stderr, "...allocation starts at %p\n", _arena_start + sizeof(node_t));
+    return _arena_start;
 }
 
 void myfree(void *ptr)
