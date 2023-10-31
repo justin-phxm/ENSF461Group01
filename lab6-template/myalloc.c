@@ -173,7 +173,43 @@ void myfree(void *ptr)
     fprintf(stderr, "...chunk of size %ld\n", header->size);
     fprintf(stderr, "...checking if coalescing is needed\n");
     // todo: check if coalescing is needed
-    if (1)
+    if ((header->bwd != NULL && header->bwd->is_free == 1) && (header->fwd != NULL && header->fwd->is_free == 1))
+    {
+        fprintf(stderr, "...col. case 1: previous, current, and next chunks all free.\n");
+        header->bwd->size += header->size + header->fwd->size + 2 * sizeof(node_t);
+        header->bwd->fwd = header->fwd->fwd;
+        if (header->fwd->fwd != NULL)
+        {
+            header->fwd->fwd->bwd = header->bwd;
+        }
+        header = header->bwd;
+    }
+    else if (header->bwd != NULL && header->bwd->is_free == 1)
+    {
+        fprintf(stderr, "...col. case 2: previous and current chunks free.\n");
+        header->bwd->size += header->size + sizeof(node_t);
+        header->bwd->fwd = header->fwd;
+        if (header->fwd != NULL)
+        {
+            header->fwd->bwd = header->bwd;
+        }
+        header = header->bwd;
+    }
+    else if (header->fwd != NULL && header->fwd->is_free == 1)
+    {
+        fprintf(stderr, "...col. case 3: current and next chunks free.\n");
+        header->size += header->fwd->size + sizeof(node_t);
+        if (header->fwd->fwd != NULL)
+        {
+            header->fwd = header->fwd->fwd;
+        }
+        else
+        {
+            header->fwd = NULL;
+        }
+        // header->fwd->bwd = header;
+    }
+    else
     {
         fprintf(stderr, "...coalescing is not needed\n");
     }
