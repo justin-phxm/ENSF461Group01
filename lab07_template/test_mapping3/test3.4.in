@@ -1,0 +1,13 @@
+% Test 3.4: load from unmapped memory
+define 10 4 4
+ctxswitch 0
+map 3 2
+store 3075 #42
+ctxswitch 1
+map 3 6
+store 3075 #66
+unmap 3
+ctxswitch 0
+load r1 3075
+ctxswitch 1
+load r1 3075

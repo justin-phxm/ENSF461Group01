@@ -1,0 +1,9 @@
+% Test 4.1: inspecting registers
+define 4 6 6
+load r1 #26
+load r2 #43
+rinspect r1
+rinspect r2
+ctxswitch 2
+rinspect r1
+rinspect r2

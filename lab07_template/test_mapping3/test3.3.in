@@ -1,0 +1,18 @@
+% Test 3.3: store/load in mapped memory
+define 5 6 6
+ctxswitch 0
+map 1 1
+load r1 #24
+store 32 r1
+ctxswitch 1
+map 1 3
+load r2 #15
+store 33 r2
+ctxswitch 0
+load r2 32
+ctxswitch 1
+load r1 33
+ctxswitch 2
+map 2 0
+% Recall that all memory must be initialized to 0
+load r1 64

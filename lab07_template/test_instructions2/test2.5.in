@@ -1,0 +1,12 @@
+% Test 2.5: add with context switch
+define 4 6 6
+ctxswitch 0
+load r1 #5
+load r2 #5
+ctxswitch 2
+load r2 #42
+load r1 #24
+ctxswitch 0
+add
+ctxswitch 2
+add

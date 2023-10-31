@@ -1,0 +1,5 @@
+% Test 1.5: Invalid context switch
+define 4 6 6
+ctxswitch 1
+ctxswitch 3
+ctxswitch 5

@@ -1,0 +1,10 @@
+% Test 3.1: basic mapping
+define 4 6 6
+map 0 15
+map 1 14
+map 2 13
+map 3 12
+map 4 11
+map 5 10
+map 6 9
+map 7 8

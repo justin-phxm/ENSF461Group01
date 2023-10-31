@@ -1,0 +1,45 @@
+% Test 4.5: LRU TLB replacement strategy
+define 3 5 4
+ctxswitch 2
+map 0 10
+map 1 11
+map 2 12
+map 3 13
+map 4 14
+map 5 15
+map 6 16
+map 7 17
+store 0 #10
+store 8 #11
+store 16 #12
+store 24 #13
+store 32 #14
+store 40 #15
+store 48 #16
+store 56 #17
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7
+store 0 #11
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7
+map 8 18
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7

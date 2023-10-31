@@ -1,0 +1,29 @@
+% Test 4.2: inspecting the page table
+define 2 5 5
+ctxswitch 0
+map 0 31
+map 1 30
+map 2 29
+map 3 28
+ctxswitch 2
+map 0 0
+map 1 1
+map 2 2
+map 3 3
+ctxswitch 0
+unmap 2
+pinspect 0
+pinspect 1
+pinspect 2
+pinspect 3
+ctxswitch 2
+unmap 1
+pinspect 0
+pinspect 1
+pinspect 2
+pinspect 3
+ctxswitch 3
+pinspect 0
+pinspect 1
+pinspect 2
+pinspect 3

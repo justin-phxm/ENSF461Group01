@@ -1,0 +1,10 @@
+% Test 2.4: add
+define 4 6 6
+load r1 #5
+load r2 #5
+add
+add
+add
+add
+add
+add

@@ -1,0 +1,22 @@
+% Test 5.2: mapping one thing
+define 1 2 2
+ctxswitch 0
+map 0 0
+store 1 #42
+ctxswitch 1
+map 0 1
+store 1 #43
+ctxswitch 2
+map 0 2
+store 1 #44
+ctxswitch 3
+map 0 3
+store 1 #45
+linspect 0
+linspect 1
+linspect 2
+linspect 3
+linspect 4
+linspect 5
+linspect 6
+linspect 7

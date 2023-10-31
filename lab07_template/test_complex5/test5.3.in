@@ -1,0 +1,54 @@
+% Test 5.3: LRU stress test
+define 3 5 4
+ctxswitch 0
+map 14 1
+map 15 2
+ctxswitch 1
+map 14 3
+map 15 4
+ctxswitch 2
+map 14 5
+map 15 6
+ctxswitch 3
+map 14 7
+map 15 8
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7
+ctxswitch 0
+store 120 #42
+ctxswitch 1
+store 120 #43
+ctxswitch 2
+store 120 #44
+ctxswitch 3
+store 120 #45
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7
+ctxswitch 0
+map 1 9
+ctxswitch 1
+map 1 10
+ctxswitch 2
+map 1 11
+ctxswitch 3
+map 1 12
+tinspect 0
+tinspect 1
+tinspect 2
+tinspect 3
+tinspect 4
+tinspect 5
+tinspect 6
+tinspect 7

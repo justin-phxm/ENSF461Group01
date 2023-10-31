@@ -1,0 +1,15 @@
+% Test 4.3: Inspecting physical Memory
+define 5 3 4
+ctxswitch 1
+map 1 2
+store 33 #42
+linspect 64
+linspect 65
+linspect 66
+ctxswitch 2
+map 0 5
+store 0 #24
+store 0 #25
+linspect 159
+linspect 160
+linspect 161

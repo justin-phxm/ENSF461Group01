@@ -1,0 +1,4 @@
+% Test 2.1: load immediate into register
+define 4 6 6
+load r1 #1
+load r2 #42

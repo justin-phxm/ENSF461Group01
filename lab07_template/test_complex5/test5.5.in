@@ -1,0 +1,85 @@
+% Test 5.5: multi-process Fibonacci
+define 6 2 2
+ctxswitch 0
+map 0 0
+ctxswitch 1
+map 0 0
+ctxswitch 2
+map 0 0
+ctxswitch 3
+map 0 0
+ctxswitch 0
+store 0 #0
+store 1 #1
+linspect 0
+linspect 1
+ctxswitch 1
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 2
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 3
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 0
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 1
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 2
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 3
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 0
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 1
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1
+ctxswitch 2
+load r1 0
+load r2 1
+add
+store 0 r2
+store 1 r1
+linspect 1

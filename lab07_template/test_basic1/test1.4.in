@@ -1,0 +1,6 @@
+% Test 1.4: context switching
+define 4 6 6
+ctxswitch 1
+ctxswitch 2
+ctxswitch 3
+ctxswitch 0

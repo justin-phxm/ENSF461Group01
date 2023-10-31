@@ -1,0 +1,16 @@
+% Test 3.5: page shared between processes
+define 3 5 5
+ctxswitch 3
+map 31 31
+ctxswitch 1
+map 31 31
+ctxswitch 3
+store 248 #1
+ctxswitch 1
+store 249 #2
+load r1 248
+load r2 249
+add
+store 250 r1
+ctxswitch 3
+load r1 250
