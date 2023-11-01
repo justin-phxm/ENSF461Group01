@@ -250,7 +250,7 @@ void ctxswitch(unsigned int pid)
 {
     if (pid < 0 || pid > 3)
     {
-        fprintf(output_file, "Invalid context switch to process %d\n", pid);
+        fprintf(output_file, "Current PID: %d. Invalid context switch to process %d", current_pid, pid);
         return;
     }
     current_pid = pid;
