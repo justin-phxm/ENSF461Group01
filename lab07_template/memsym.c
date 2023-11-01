@@ -15,6 +15,18 @@ typedef struct
     int valid; // validity bit: can be 0 (invalid) or 1 (valid)
 } TLB_entry;
 
+typedef struct
+{
+    Page_table_entry entries[4];
+} Page_table;
+
+typedef struct
+{
+    // unsigned int vpn;
+    unsigned int pfn;
+    int valid; // validity bit: can be 0 (invalid) or 1 (valid)
+} Page_table_entry;
+
 // Output file
 FILE *output_file;
 
@@ -22,7 +34,8 @@ FILE *output_file;
 char *strategy;
 
 // Global variables
-unsigned int size_offset, size_ppn, size_vpn;
+unsigned int size_offset, size_ppn, size_vpn, current_pid;
+unsigned long int **physical_memory = NULL;
 TLB_entry TLB[TLB_SIZE];
 
 // Function prototypes
@@ -35,6 +48,9 @@ void pinspect(unsigned int vpn);
 TLB_entry tinspect(unsigned int tlbn);
 
 // unsigned long int linspect();
+void initialize_TLB();
+void initialize_physical_memory(int size);
+void cleanup_physical_memory();
 
 char **tokenize_input(char *input)
 {
@@ -115,6 +131,7 @@ int main(int argc, char *argv[])
         // for example, 1.2.in is 4 6 6
         if (strcmp(tokens[0], "%") != 0)
         {
+            fprintf(output_file, "Current PID: %d. ", current_pid);
             if (size_offset == 0 && size_ppn == 0 && size_vpn == 0)
             {
                 if (strcmp(tokens[0], "define") == 0)
@@ -146,6 +163,7 @@ int main(int argc, char *argv[])
     // Close input and output files
     fclose(input_file);
     fclose(output_file);
+    cleanup_physical_memory(size_offset + size_ppn);
 
     return 0;
 }
@@ -161,11 +179,47 @@ void initialize_TLB()
     }
 }
 
+// Initialize physical_memory
+/* Access and modify individual elements of the array
+ *(physical_memory[0]) = 42;
+ *(physical_memory[1]) = 123;
+ */
+void initialize_physical_memory(int size)
+{
+    fprintf(output_file, "Memory instantiation complete. ");
+    physical_memory = (unsigned long int **)malloc(size * sizeof(unsigned long int *));
+    if (physical_memory == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed. Exiting.\n");
+        exit(1);
+    }
+
+    // Initialize each word in memory to 0
+    for (int i = 0; i < size; i++)
+    {
+        physical_memory[i] = (unsigned long int *)calloc(size, sizeof(unsigned long int));
+        if (physical_memory[i] == NULL)
+        {
+            fprintf(stderr, "Memory allocation failed for element %d. Exiting.\n", i);
+            exit(1);
+        }
+    }
+}
+// Cleanup function to free the allocated memory
+void cleanup_physical_memory(int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        free(physical_memory[i]);
+    }
+    free(physical_memory);
+}
 // Function to set global variables
 void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned int num_vpn_bits)
 {
+    initialize_physical_memory(num_offset_bits + num_ppn_bits);
+    fprintf(output_file, "OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
     initialize_TLB();
-    fprintf(output_file, "Memory instantiation complete. OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
 
     size_offset = num_offset_bits;
     size_ppn = num_ppn_bits;
