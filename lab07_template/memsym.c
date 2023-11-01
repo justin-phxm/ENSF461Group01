@@ -5,15 +5,7 @@
 
 #define TRUE 1
 #define FALSE 0
-
-// Output file
-FILE *output_file;
-
-// TLB replacement strategy (FIFO or LRU)
-char *strategy;
-
-// Global variables
-unsigned int size_offset, size_ppn, size_vpn;
+#define TLB_SIZE 8
 
 // TLB structure
 typedef struct
@@ -23,30 +15,26 @@ typedef struct
     int valid; // validity bit: can be 0 (invalid) or 1 (valid)
 } TLB_entry;
 
-#define TLB_SIZE 8
+// Output file
+FILE *output_file;
+
+// TLB replacement strategy (FIFO or LRU)
+char *strategy;
+
+// Global variables
+unsigned int size_offset, size_ppn, size_vpn;
 TLB_entry TLB[TLB_SIZE];
 
-// Initialize TLB entries
-void initialize_TLB()
-{
-    for (int i = 0; i < TLB_SIZE; i++)
-    {
-        TLB[i].vpn = 0;
-        TLB[i].ppn = 0;
-        TLB[i].valid = 0;
-    }
-}
+// Function prototypes
+void initialize_TLB();
+void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned int num_vpn_bits);
+void ctxswitch(unsigned int pid);
+void map(unsigned int vpn, unsigned int ppn);
+void unmap(unsigned int vpn);
+void pinspect(unsigned int vpn);
+TLB_entry tinspect(unsigned int tlbn);
 
-// Function to set global variables
-void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned int num_vpn_bits)
-{
-    initialize_TLB();
-    fprintf(output_file, "Memory instantiation complete. OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
-
-    size_offset = num_offset_bits;
-    size_ppn = num_ppn_bits;
-    size_vpn = num_vpn_bits;
-}
+// unsigned long int linspect();
 
 char **tokenize_input(char *input)
 {
@@ -160,4 +148,26 @@ int main(int argc, char *argv[])
     fclose(output_file);
 
     return 0;
+}
+
+// Initialize TLB entries
+void initialize_TLB()
+{
+    for (int i = 0; i < TLB_SIZE; i++)
+    {
+        TLB[i].vpn = 0;
+        TLB[i].ppn = 0;
+        TLB[i].valid = 0;
+    }
+}
+
+// Function to set global variables
+void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned int num_vpn_bits)
+{
+    initialize_TLB();
+    fprintf(output_file, "Memory instantiation complete. OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
+
+    size_offset = num_offset_bits;
+    size_ppn = num_ppn_bits;
+    size_vpn = num_vpn_bits;
 }
