@@ -7,6 +7,11 @@
 #define FALSE 0
 #define TLB_SIZE 8
 
+// Forward declarations of structs
+struct TLB_entry;
+struct Page_table_entry;
+struct Page_table;
+
 // TLB structure
 typedef struct
 {
@@ -17,15 +22,15 @@ typedef struct
 
 typedef struct
 {
-    Page_table_entry entries[4];
-} Page_table;
-
-typedef struct
-{
     // unsigned int vpn;
     unsigned int pfn;
     int valid; // validity bit: can be 0 (invalid) or 1 (valid)
 } Page_table_entry;
+
+typedef struct
+{
+    Page_table_entry entries[4];
+} Page_table;
 
 // Output file
 FILE *output_file;
@@ -34,7 +39,7 @@ FILE *output_file;
 char *strategy;
 
 // Global variables
-unsigned int size_offset, size_ppn, size_vpn, current_pid;
+unsigned int size_offset, size_ppn, size_vpn, current_pid = 0;
 unsigned long int **physical_memory = NULL;
 TLB_entry TLB[TLB_SIZE];
 
@@ -131,7 +136,10 @@ int main(int argc, char *argv[])
         // for example, 1.2.in is 4 6 6
         if (strcmp(tokens[0], "%") != 0)
         {
-            fprintf(output_file, "Current PID: %d. ", current_pid);
+            if (strcmp(tokens[0], "ctxswitch") != 0)
+            {
+                fprintf(output_file, "Current PID: %d. ", current_pid);
+            }
             if (size_offset == 0 && size_ppn == 0 && size_vpn == 0)
             {
                 if (strcmp(tokens[0], "define") == 0)
@@ -146,8 +154,20 @@ int main(int argc, char *argv[])
             }
             else
             {
-                fprintf(output_file, "Error: multiple calls to define in the same trace\n");
-                return -1;
+                if (strcmp(tokens[0], "define") == 0)
+                {
+                    fprintf(output_file, "Error: multiple calls to define in the same trace\n");
+                    return -1;
+                }
+                if (strcmp(tokens[0], "ctxswitch") == 0)
+                {
+                    ctxswitch(atoi(tokens[1]));
+                }
+                else
+                {
+                    fprintf(output_file, "Error: Unknown instruction...\n");
+                    return -1;
+                }
             }
         }
 
@@ -224,4 +244,16 @@ void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned in
     size_offset = num_offset_bits;
     size_ppn = num_ppn_bits;
     size_vpn = num_vpn_bits;
+}
+
+void ctxswitch(unsigned int pid)
+{
+    if (pid < 0 || pid > 3)
+    {
+        fprintf(output_file, "Invalid context switch to process %d\n", pid);
+        return;
+    }
+    current_pid = pid;
+    fprintf(output_file, "Current PID: %d. Switched execution context to process: %d\n", pid, pid);
+    // todo: save register values
 }
