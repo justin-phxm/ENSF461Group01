@@ -1,0 +1,108 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 6. PFN bits: 2. VPN bits: 2
+Current PID: 0. Mapped virtual page number 0 to physical frame number 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored immediate 0 into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored immediate 1 into location 1
+Current PID: 0. Inspected physical location 0. Value: 0
+Current PID: 0. Inspected physical location 1. Value: 1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (0) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (1) into register r2
+Current PID: 0. Added contents of registers r1 (0) and r2 (1). Result: 1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (1) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (1) into location 1
+Current PID: 0. Inspected physical location 1. Value: 1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (1) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (1) into register r2
+Current PID: 0. Added contents of registers r1 (1) and r2 (1). Result: 2
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (1) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (2) into location 1
+Current PID: 0. Inspected physical location 1. Value: 2
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (1) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (2) into register r2
+Current PID: 0. Added contents of registers r1 (1) and r2 (2). Result: 3
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (2) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (3) into location 1
+Current PID: 0. Inspected physical location 1. Value: 3
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (2) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (3) into register r2
+Current PID: 0. Added contents of registers r1 (2) and r2 (3). Result: 5
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (3) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (5) into location 1
+Current PID: 0. Inspected physical location 1. Value: 5
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (3) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (5) into register r2
+Current PID: 0. Added contents of registers r1 (3) and r2 (5). Result: 8
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (5) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (8) into location 1
+Current PID: 0. Inspected physical location 1. Value: 8
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (5) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (8) into register r2
+Current PID: 0. Added contents of registers r1 (5) and r2 (8). Result: 13
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (8) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (13) into location 1
+Current PID: 0. Inspected physical location 1. Value: 13
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (8) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (13) into register r2
+Current PID: 0. Added contents of registers r1 (8) and r2 (13). Result: 21
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (13) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (21) into location 1
+Current PID: 0. Inspected physical location 1. Value: 21
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (13) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (21) into register r2
+Current PID: 0. Added contents of registers r1 (13) and r2 (21). Result: 34
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (21) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (34) into location 1
+Current PID: 0. Inspected physical location 1. Value: 34
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (21) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (34) into register r2
+Current PID: 0. Added contents of registers r1 (21) and r2 (34). Result: 55
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (34) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (55) into location 1
+Current PID: 0. Inspected physical location 1. Value: 55
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 0 (34) into register r1
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Loaded value of location 1 (55) into register r2
+Current PID: 0. Added contents of registers r1 (34) and r2 (55). Result: 89
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r2 (55) into location 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored value of register r1 (89) into location 1
+Current PID: 0. Inspected physical location 1. Value: 89

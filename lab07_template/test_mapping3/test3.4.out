@@ -1,0 +1,16 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 10. PFN bits: 4. VPN bits: 4
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Mapped virtual page number 3 to physical frame number 2
+Current PID: 0. Translating. Lookup for VPN 3 hit in TLB entry 0. PFN is 2
+Current PID: 0. Stored immediate 42 into location 3075
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Mapped virtual page number 3 to physical frame number 6
+Current PID: 1. Translating. Lookup for VPN 3 hit in TLB entry 1. PFN is 6
+Current PID: 1. Stored immediate 66 into location 3075
+Current PID: 1. Unmapped virtual page number 3
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Translating. Lookup for VPN 3 hit in TLB entry 0. PFN is 2
+Current PID: 0. Loaded value of location 3075 (42) into register r1
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Translating. Lookup for VPN 3 caused a TLB miss
+Current PID: 1. Translating. Translation for VPN 3 not found in page table

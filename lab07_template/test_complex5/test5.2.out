@@ -1,0 +1,25 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 1. PFN bits: 2. VPN bits: 2
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Mapped virtual page number 0 to physical frame number 0
+Current PID: 0. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 0
+Current PID: 0. Stored immediate 42 into location 1
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Mapped virtual page number 0 to physical frame number 1
+Current PID: 1. Translating. Lookup for VPN 0 hit in TLB entry 1. PFN is 1
+Current PID: 1. Stored immediate 43 into location 1
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Mapped virtual page number 0 to physical frame number 2
+Current PID: 2. Translating. Lookup for VPN 0 hit in TLB entry 2. PFN is 2
+Current PID: 2. Stored immediate 44 into location 1
+Current PID: 3. Switched execution context to process: 3
+Current PID: 3. Mapped virtual page number 0 to physical frame number 3
+Current PID: 3. Translating. Lookup for VPN 0 hit in TLB entry 3. PFN is 3
+Current PID: 3. Stored immediate 45 into location 1
+Current PID: 3. Inspected physical location 0. Value: 0
+Current PID: 3. Inspected physical location 1. Value: 42
+Current PID: 3. Inspected physical location 2. Value: 0
+Current PID: 3. Inspected physical location 3. Value: 43
+Current PID: 3. Inspected physical location 4. Value: 0
+Current PID: 3. Inspected physical location 5. Value: 44
+Current PID: 3. Inspected physical location 6. Value: 0
+Current PID: 3. Inspected physical location 7. Value: 45

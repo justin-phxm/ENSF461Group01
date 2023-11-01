@@ -1,0 +1,57 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 3. PFN bits: 5. VPN bits: 4
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Mapped virtual page number 14 to physical frame number 1
+Current PID: 0. Mapped virtual page number 15 to physical frame number 2
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Mapped virtual page number 14 to physical frame number 3
+Current PID: 1. Mapped virtual page number 15 to physical frame number 4
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Mapped virtual page number 14 to physical frame number 5
+Current PID: 2. Mapped virtual page number 15 to physical frame number 6
+Current PID: 3. Switched execution context to process: 3
+Current PID: 3. Mapped virtual page number 14 to physical frame number 7
+Current PID: 3. Mapped virtual page number 15 to physical frame number 8
+Current PID: 3. Inspected TLB entry 0. VPN: 14. PFN: 1. Valid: 1. PID: 0. Timestamp: 3
+Current PID: 3. Inspected TLB entry 1. VPN: 15. PFN: 2. Valid: 1. PID: 0. Timestamp: 4
+Current PID: 3. Inspected TLB entry 2. VPN: 14. PFN: 3. Valid: 1. PID: 1. Timestamp: 6
+Current PID: 3. Inspected TLB entry 3. VPN: 15. PFN: 4. Valid: 1. PID: 1. Timestamp: 7
+Current PID: 3. Inspected TLB entry 4. VPN: 14. PFN: 5. Valid: 1. PID: 2. Timestamp: 9
+Current PID: 3. Inspected TLB entry 5. VPN: 15. PFN: 6. Valid: 1. PID: 2. Timestamp: 10
+Current PID: 3. Inspected TLB entry 6. VPN: 14. PFN: 7. Valid: 1. PID: 3. Timestamp: 12
+Current PID: 3. Inspected TLB entry 7. VPN: 15. PFN: 8. Valid: 1. PID: 3. Timestamp: 13
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Translating. Lookup for VPN 15 hit in TLB entry 1. PFN is 2
+Current PID: 0. Stored immediate 42 into location 120
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Translating. Lookup for VPN 15 hit in TLB entry 3. PFN is 4
+Current PID: 1. Stored immediate 43 into location 120
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Translating. Lookup for VPN 15 hit in TLB entry 5. PFN is 6
+Current PID: 2. Stored immediate 44 into location 120
+Current PID: 3. Switched execution context to process: 3
+Current PID: 3. Translating. Lookup for VPN 15 hit in TLB entry 7. PFN is 8
+Current PID: 3. Stored immediate 45 into location 120
+Current PID: 3. Inspected TLB entry 0. VPN: 14. PFN: 1. Valid: 1. PID: 0. Timestamp: 3
+Current PID: 3. Inspected TLB entry 1. VPN: 15. PFN: 2. Valid: 1. PID: 0. Timestamp: 23
+Current PID: 3. Inspected TLB entry 2. VPN: 14. PFN: 3. Valid: 1. PID: 1. Timestamp: 6
+Current PID: 3. Inspected TLB entry 3. VPN: 15. PFN: 4. Valid: 1. PID: 1. Timestamp: 25
+Current PID: 3. Inspected TLB entry 4. VPN: 14. PFN: 5. Valid: 1. PID: 2. Timestamp: 9
+Current PID: 3. Inspected TLB entry 5. VPN: 15. PFN: 6. Valid: 1. PID: 2. Timestamp: 27
+Current PID: 3. Inspected TLB entry 6. VPN: 14. PFN: 7. Valid: 1. PID: 3. Timestamp: 12
+Current PID: 3. Inspected TLB entry 7. VPN: 15. PFN: 8. Valid: 1. PID: 3. Timestamp: 29
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Mapped virtual page number 1 to physical frame number 9
+Current PID: 1. Switched execution context to process: 1
+Current PID: 1. Mapped virtual page number 1 to physical frame number 10
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Mapped virtual page number 1 to physical frame number 11
+Current PID: 3. Switched execution context to process: 3
+Current PID: 3. Mapped virtual page number 1 to physical frame number 12
+Current PID: 3. Inspected TLB entry 0. VPN: 1. PFN: 9. Valid: 1. PID: 0. Timestamp: 39
+Current PID: 3. Inspected TLB entry 1. VPN: 15. PFN: 2. Valid: 1. PID: 0. Timestamp: 23
+Current PID: 3. Inspected TLB entry 2. VPN: 1. PFN: 10. Valid: 1. PID: 1. Timestamp: 41
+Current PID: 3. Inspected TLB entry 3. VPN: 15. PFN: 4. Valid: 1. PID: 1. Timestamp: 25
+Current PID: 3. Inspected TLB entry 4. VPN: 1. PFN: 11. Valid: 1. PID: 2. Timestamp: 43
+Current PID: 3. Inspected TLB entry 5. VPN: 15. PFN: 6. Valid: 1. PID: 2. Timestamp: 27
+Current PID: 3. Inspected TLB entry 6. VPN: 1. PFN: 12. Valid: 1. PID: 3. Timestamp: 45
+Current PID: 3. Inspected TLB entry 7. VPN: 15. PFN: 8. Valid: 1. PID: 3. Timestamp: 29

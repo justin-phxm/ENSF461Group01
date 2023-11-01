@@ -1,0 +1,9 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 4. PFN bits: 6. VPN bits: 6
+Current PID: 0. Loaded immediate 5 into register r1
+Current PID: 0. Loaded immediate 5 into register r2
+Current PID: 0. Added contents of registers r1 (5) and r2 (5). Result: 10
+Current PID: 0. Added contents of registers r1 (10) and r2 (5). Result: 15
+Current PID: 0. Added contents of registers r1 (15) and r2 (5). Result: 20
+Current PID: 0. Added contents of registers r1 (20) and r2 (5). Result: 25
+Current PID: 0. Added contents of registers r1 (25) and r2 (5). Result: 30
+Current PID: 0. Added contents of registers r1 (30) and r2 (5). Result: 35

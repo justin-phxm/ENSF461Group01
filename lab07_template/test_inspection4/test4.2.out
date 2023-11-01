@@ -1,0 +1,28 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 2. PFN bits: 5. VPN bits: 5
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Mapped virtual page number 0 to physical frame number 31
+Current PID: 0. Mapped virtual page number 1 to physical frame number 30
+Current PID: 0. Mapped virtual page number 2 to physical frame number 29
+Current PID: 0. Mapped virtual page number 3 to physical frame number 28
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Mapped virtual page number 0 to physical frame number 0
+Current PID: 2. Mapped virtual page number 1 to physical frame number 1
+Current PID: 2. Mapped virtual page number 2 to physical frame number 2
+Current PID: 2. Mapped virtual page number 3 to physical frame number 3
+Current PID: 0. Switched execution context to process: 0
+Current PID: 0. Unmapped virtual page number 2
+Current PID: 0. Inspected page table entry 0. Physical frame number: 31. Valid: 1
+Current PID: 0. Inspected page table entry 1. Physical frame number: 30. Valid: 1
+Current PID: 0. Inspected page table entry 2. Physical frame number: 0. Valid: 0
+Current PID: 0. Inspected page table entry 3. Physical frame number: 28. Valid: 1
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Unmapped virtual page number 1
+Current PID: 2. Inspected page table entry 0. Physical frame number: 0. Valid: 1
+Current PID: 2. Inspected page table entry 1. Physical frame number: 0. Valid: 0
+Current PID: 2. Inspected page table entry 2. Physical frame number: 2. Valid: 1
+Current PID: 2. Inspected page table entry 3. Physical frame number: 3. Valid: 1
+Current PID: 3. Switched execution context to process: 3
+Current PID: 3. Inspected page table entry 0. Physical frame number: 0. Valid: 0
+Current PID: 3. Inspected page table entry 1. Physical frame number: 0. Valid: 0
+Current PID: 3. Inspected page table entry 2. Physical frame number: 0. Valid: 0
+Current PID: 3. Inspected page table entry 3. Physical frame number: 0. Valid: 0

@@ -1,0 +1,53 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 3. PFN bits: 5. VPN bits: 4
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Mapped virtual page number 0 to physical frame number 10
+Current PID: 2. Mapped virtual page number 1 to physical frame number 11
+Current PID: 2. Mapped virtual page number 2 to physical frame number 12
+Current PID: 2. Mapped virtual page number 3 to physical frame number 13
+Current PID: 2. Mapped virtual page number 4 to physical frame number 14
+Current PID: 2. Mapped virtual page number 5 to physical frame number 15
+Current PID: 2. Mapped virtual page number 6 to physical frame number 16
+Current PID: 2. Mapped virtual page number 7 to physical frame number 17
+Current PID: 2. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 10
+Current PID: 2. Stored immediate 10 into location 0
+Current PID: 2. Translating. Lookup for VPN 1 hit in TLB entry 1. PFN is 11
+Current PID: 2. Stored immediate 11 into location 8
+Current PID: 2. Translating. Lookup for VPN 2 hit in TLB entry 2. PFN is 12
+Current PID: 2. Stored immediate 12 into location 16
+Current PID: 2. Translating. Lookup for VPN 3 hit in TLB entry 3. PFN is 13
+Current PID: 2. Stored immediate 13 into location 24
+Current PID: 2. Translating. Lookup for VPN 4 hit in TLB entry 4. PFN is 14
+Current PID: 2. Stored immediate 14 into location 32
+Current PID: 2. Translating. Lookup for VPN 5 hit in TLB entry 5. PFN is 15
+Current PID: 2. Stored immediate 15 into location 40
+Current PID: 2. Translating. Lookup for VPN 6 hit in TLB entry 6. PFN is 16
+Current PID: 2. Stored immediate 16 into location 48
+Current PID: 2. Translating. Lookup for VPN 7 hit in TLB entry 7. PFN is 17
+Current PID: 2. Stored immediate 17 into location 56
+Current PID: 2. Inspected TLB entry 0. VPN: 0. PFN: 10. Valid: 1. PID: 2. Timestamp: 11
+Current PID: 2. Inspected TLB entry 1. VPN: 1. PFN: 11. Valid: 1. PID: 2. Timestamp: 12
+Current PID: 2. Inspected TLB entry 2. VPN: 2. PFN: 12. Valid: 1. PID: 2. Timestamp: 13
+Current PID: 2. Inspected TLB entry 3. VPN: 3. PFN: 13. Valid: 1. PID: 2. Timestamp: 14
+Current PID: 2. Inspected TLB entry 4. VPN: 4. PFN: 14. Valid: 1. PID: 2. Timestamp: 15
+Current PID: 2. Inspected TLB entry 5. VPN: 5. PFN: 15. Valid: 1. PID: 2. Timestamp: 16
+Current PID: 2. Inspected TLB entry 6. VPN: 6. PFN: 16. Valid: 1. PID: 2. Timestamp: 17
+Current PID: 2. Inspected TLB entry 7. VPN: 7. PFN: 17. Valid: 1. PID: 2. Timestamp: 18
+Current PID: 2. Translating. Lookup for VPN 0 hit in TLB entry 0. PFN is 10
+Current PID: 2. Stored immediate 11 into location 0
+Current PID: 2. Inspected TLB entry 0. VPN: 0. PFN: 10. Valid: 1. PID: 2. Timestamp: 27
+Current PID: 2. Inspected TLB entry 1. VPN: 1. PFN: 11. Valid: 1. PID: 2. Timestamp: 12
+Current PID: 2. Inspected TLB entry 2. VPN: 2. PFN: 12. Valid: 1. PID: 2. Timestamp: 13
+Current PID: 2. Inspected TLB entry 3. VPN: 3. PFN: 13. Valid: 1. PID: 2. Timestamp: 14
+Current PID: 2. Inspected TLB entry 4. VPN: 4. PFN: 14. Valid: 1. PID: 2. Timestamp: 15
+Current PID: 2. Inspected TLB entry 5. VPN: 5. PFN: 15. Valid: 1. PID: 2. Timestamp: 16
+Current PID: 2. Inspected TLB entry 6. VPN: 6. PFN: 16. Valid: 1. PID: 2. Timestamp: 17
+Current PID: 2. Inspected TLB entry 7. VPN: 7. PFN: 17. Valid: 1. PID: 2. Timestamp: 18
+Current PID: 2. Mapped virtual page number 8 to physical frame number 18
+Current PID: 2. Inspected TLB entry 0. VPN: 0. PFN: 10. Valid: 1. PID: 2. Timestamp: 27
+Current PID: 2. Inspected TLB entry 1. VPN: 8. PFN: 18. Valid: 1. PID: 2. Timestamp: 36
+Current PID: 2. Inspected TLB entry 2. VPN: 2. PFN: 12. Valid: 1. PID: 2. Timestamp: 13
+Current PID: 2. Inspected TLB entry 3. VPN: 3. PFN: 13. Valid: 1. PID: 2. Timestamp: 14
+Current PID: 2. Inspected TLB entry 4. VPN: 4. PFN: 14. Valid: 1. PID: 2. Timestamp: 15
+Current PID: 2. Inspected TLB entry 5. VPN: 5. PFN: 15. Valid: 1. PID: 2. Timestamp: 16
+Current PID: 2. Inspected TLB entry 6. VPN: 6. PFN: 16. Valid: 1. PID: 2. Timestamp: 17
+Current PID: 2. Inspected TLB entry 7. VPN: 7. PFN: 17. Valid: 1. PID: 2. Timestamp: 18

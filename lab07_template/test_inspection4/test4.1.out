@@ -1,0 +1,8 @@
+Current PID: 0. Memory instantiation complete. OFF bits: 4. PFN bits: 6. VPN bits: 6
+Current PID: 0. Loaded immediate 26 into register r1
+Current PID: 0. Loaded immediate 43 into register r2
+Current PID: 0. Inspected register r1. Content: 26
+Current PID: 0. Inspected register r2. Content: 43
+Current PID: 2. Switched execution context to process: 2
+Current PID: 2. Inspected register r1. Content: 0
+Current PID: 2. Inspected register r2. Content: 0
