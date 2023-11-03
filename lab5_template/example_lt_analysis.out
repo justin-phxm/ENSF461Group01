@@ -1,0 +1,38 @@
+Execution trace with LT:
+t=0: [Job 2] arrived at [0], ran for: [10]
+t=10: [Job 1] arrived at [0], ran for: [10]
+t=20: [Job 0] arrived at [0], ran for: [10]
+t=30: [Job 2] arrived at [0], ran for: [10]
+t=40: [Job 2] arrived at [0], ran for: [10]
+t=50: [Job 1] arrived at [0], ran for: [10]
+t=60: [Job 2] arrived at [0], ran for: [10]
+t=70: [Job 1] arrived at [0], ran for: [10]
+t=80: [Job 2] arrived at [0], ran for: [10]
+t=90: [Job 2] arrived at [0], ran for: [10]
+t=100: [Job 2] arrived at [0], ran for: [10]
+t=110: [Job 0] arrived at [0], ran for: [10]
+t=120: [Job 1] arrived at [0], ran for: [10]
+t=130: [Job 2] arrived at [0], ran for: [10]
+t=140: [Job 2] arrived at [0], ran for: [10]
+t=150: [Job 0] arrived at [0], ran for: [10]
+t=160: [Job 1] arrived at [0], ran for: [10]
+t=170: [Job 2] arrived at [0], ran for: [10]
+t=180: [Job 1] arrived at [0], ran for: [10]
+t=190: [Job 0] arrived at [0], ran for: [10]
+t=200: [Job 1] arrived at [0], ran for: [10]
+t=210: [Job 1] arrived at [0], ran for: [10]
+t=220: [Job 0] arrived at [0], ran for: [10]
+t=230: [Job 1] arrived at [0], ran for: [10]
+t=240: [Job 1] arrived at [0], ran for: [10]
+t=250: [Job 0] arrived at [0], ran for: [10]
+t=260: [Job 0] arrived at [0], ran for: [10]
+t=270: [Job 0] arrived at [0], ran for: [10]
+t=280: [Job 0] arrived at [0], ran for: [10]
+t=290: [Job 0] arrived at [0], ran for: [10]
+End of execution with LT.
+Begin analyzing LT:
+Job 0 -- Response time: 20  Turnaround: 300  Wait: 200
+Job 1 -- Response time: 10  Turnaround: 250  Wait: 150
+Job 2 -- Response time: 0  Turnaround: 180  Wait: 80
+Average -- Response: 10.00  Turnaround 243.33  Wait 143.33
+End analyzing LT.

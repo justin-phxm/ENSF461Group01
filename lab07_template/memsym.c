@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-
+#include <math.h>
 #define TRUE 1
 #define FALSE 0
 #define TLB_SIZE 8
@@ -25,6 +25,7 @@ typedef struct
     // unsigned int vpn;
     unsigned int pfn;
     int valid; // validity bit: can be 0 (invalid) or 1 (valid)
+    unsigned long int r1, r2;
 } Page_table_entry;
 
 typedef struct
@@ -41,7 +42,9 @@ char *strategy;
 // Global variables
 unsigned int size_offset, size_ppn, size_vpn, current_pid = 0;
 unsigned long int **physical_memory = NULL;
+unsigned long int r1 = 0, r2 = 0;
 TLB_entry TLB[TLB_SIZE];
+Page_table pt;
 
 // Function prototypes
 void initialize_TLB();
@@ -51,10 +54,12 @@ void map(unsigned int vpn, unsigned int ppn);
 void unmap(unsigned int vpn);
 void pinspect(unsigned int vpn);
 TLB_entry tinspect(unsigned int tlbn);
+void load(char *dst, unsigned int src);
+void add();
 
 // unsigned long int linspect();
 void initialize_TLB();
-void initialize_physical_memory(int size);
+void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_ppn_bits);
 void cleanup_physical_memory();
 
 char **tokenize_input(char *input)
@@ -154,15 +159,26 @@ int main(int argc, char *argv[])
             }
             else
             {
+
                 if (strcmp(tokens[0], "define") == 0)
                 {
                     fprintf(output_file, "Error: multiple calls to define in the same trace\n");
                     return -1;
                 }
-                if (strcmp(tokens[0], "ctxswitch") == 0)
+                else if (strcmp(tokens[0], "ctxswitch") == 0)
                 {
                     ctxswitch(atoi(tokens[1]));
                 }
+                else if (strcmp(tokens[0], "load") == 0)
+                {
+                    char *skipHash = tokens[2] + 1;
+                    load(tokens[1], atoi(skipHash));
+                }
+                else if (strcmp(tokens[0], "add") == 0)
+                {
+                    add();
+                }
+
                 else
                 {
                     fprintf(output_file, "Error: Unknown instruction...\n");
@@ -188,6 +204,24 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+void load(char *dst, unsigned int src)
+{
+    if (strcmp(dst, "r1") == 0)
+    {
+        r1 = src;
+        fprintf(output_file, "Loaded immediate %d into register %s\n", src, dst);
+    }
+    else if (strcmp(dst, "r2") == 0)
+    {
+        r2 = src;
+        fprintf(output_file, "Loaded immediate %d into register %s\n", src, dst);
+    }
+    else
+    {
+        fprintf(output_file, "Error: invalid register operand %s\n", dst);
+    }
+}
+
 // Initialize TLB entries
 void initialize_TLB()
 {
@@ -200,14 +234,13 @@ void initialize_TLB()
 }
 
 // Initialize physical_memory
-/* Access and modify individual elements of the array
- *(physical_memory[0]) = 42;
- *(physical_memory[1]) = 123;
- */
-void initialize_physical_memory(int size)
+void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_ppn_bits)
 {
     fprintf(output_file, "Memory instantiation complete. ");
-    physical_memory = (unsigned long int **)malloc(size * sizeof(unsigned long int *));
+    int numPages = pow(2, num_ppn_bits);
+    int pageSize = pow(2, num_offset_bits);
+
+    physical_memory = (unsigned long int **)malloc(numPages * sizeof(unsigned long int *));
     if (physical_memory == NULL)
     {
         fprintf(stderr, "Memory allocation failed. Exiting.\n");
@@ -215,9 +248,9 @@ void initialize_physical_memory(int size)
     }
 
     // Initialize each word in memory to 0
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < num_ppn_bits; i++)
     {
-        physical_memory[i] = (unsigned long int *)calloc(size, sizeof(unsigned long int));
+        physical_memory[i] = (unsigned long int *)calloc(pageSize, sizeof(unsigned long int));
         if (physical_memory[i] == NULL)
         {
             fprintf(stderr, "Memory allocation failed for element %d. Exiting.\n", i);
@@ -225,6 +258,17 @@ void initialize_physical_memory(int size)
         }
     }
 }
+
+// Initialize Page Table
+void initialize_Page_table()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        pt.entries[i].pfn = 0;
+        pt.entries[i].valid = 0;
+    }
+}
+
 // Cleanup function to free the allocated memory
 void cleanup_physical_memory(int size)
 {
@@ -237,9 +281,11 @@ void cleanup_physical_memory(int size)
 // Function to set global variables
 void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned int num_vpn_bits)
 {
-    initialize_physical_memory(num_offset_bits + num_ppn_bits);
+    // fprintf(output_file, "Memory instantiation started. ");
+    initialize_physical_memory(num_offset_bits, num_ppn_bits);
     fprintf(output_file, "OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
     initialize_TLB();
+    initialize_Page_table();
 
     size_offset = num_offset_bits;
     size_ppn = num_ppn_bits;
@@ -248,12 +294,26 @@ void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned in
 
 void ctxswitch(unsigned int pid)
 {
+    // Check if pid is withing bounds
     if (pid < 0 || pid > 3)
     {
         fprintf(output_file, "Current PID: %d. Invalid context switch to process %d\n", current_pid, pid);
         return;
     }
+    // Save contents from old process
+    pt.entries[current_pid].r1 = r1;
+    pt.entries[current_pid].r2 = r2;
+
+    // Load contents from new process
     current_pid = pid;
+    r1 = pt.entries[pid].r1;
+    r2 = pt.entries[pid].r2;
     fprintf(output_file, "Current PID: %d. Switched execution context to process: %d\n", pid, pid);
-    // todo: save register values
+}
+
+void add()
+{
+    unsigned long int sum = r1 + r2;
+    fprintf(output_file, "Added contents of registers r1 (%ld) and r2 (%ld). Result: %ld\n", r1, r2, sum);
+    r1 = sum;
 }

@@ -1,0 +1,99 @@
+Script started on 2022-02-04 04:33:42+00:00 [TERM="xterm" TTY="/dev/pts/0" COLUMNS="127" LINES="64"]
+# ./test_part3.sh -v
+Removing old myalloc binary.
+[32m>>Testing allocations with splits.
+[0mInitializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7f05c471a000
+...arena ends at 0x7f05c471b000
+...initializing header for initial free chunk
+...header size is 32 bytes
+Allocating memory:
+...looking for free chunk of >= 64 bytes
+...found free chunk of 4064 bytes with header at 0x7f05c471a000
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting free chunk
+...updating chunk header at 0x7f05c471a000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7f05c471a020
+[32mAssert 1 passed!
+[0mHeader->size: 64
+Header->fwd: 0x7f05c471a060
+Header->bwd: (nil)
+Header->is_free: 0
+[32mAssert 2 passed!
+[0m[32mAssert 3 passed!
+[0m[32mAssert 4 passed!
+[0m[32mAssert 5 passed!
+[0mHeader->size: 3968
+Header->fwd: (nil)
+Header->bwd: 0x7f05c471a000
+Header->is_free: 1
+[32mAssert 6 passed!
+[0m[32mAssert 7 passed!
+[0m[32mAssert 8 passed!
+[0m[32mAssert 9 passed!
+[0mAllocating memory:
+...looking for free chunk of >= 3968 bytes
+...found free chunk of 3968 bytes with header at 0x7f05c471a060
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to 0x7f05c471a000
+...checking if splitting is required
+...splitting not required
+...updating chunk header at 0x7f05c471a060
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7f05c471a080
+Header->size: 3968
+Header->fwd: (nil)
+Header->bwd: 0x7f05c471a000
+Header->is_free: 0
+[32mAssert 10 passed!
+[0m[32mAssert 11 passed!
+[0m[32mAssert 12 passed!
+[0m[32mAssert 13 passed!
+[0m[32mAssert 14 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+Initializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7f05c471a000
+...arena ends at 0x7f05c471b000
+...initializing header for initial free chunk
+...header size is 32 bytes
+Allocating memory:
+...looking for free chunk of >= 64 bytes
+...found free chunk of 4064 bytes with header at 0x7f05c471a000
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting free chunk
+...updating chunk header at 0x7f05c471a000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7f05c471a020
+Allocating memory:
+...looking for free chunk of >= 3958 bytes
+...found free chunk of 3968 bytes with header at 0x7f05c471a060
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to 0x7f05c471a000
+...checking if splitting is required
+...splitting not possible
+...updating chunk header at 0x7f05c471a060
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7f05c471a080
+Header->size: 3968
+Header->fwd: (nil)
+Header->bwd: 0x7f05c471a000
+Header->is_free: 0
+[32mAssert 15 passed!
+[0m[32mAssert 16 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+# 
+
+Script done on 2022-02-04 04:33:51+00:00 [COMMAND_EXIT_CODE="0"]

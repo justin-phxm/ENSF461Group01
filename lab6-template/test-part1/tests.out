@@ -1,0 +1,54 @@
+Script started on 2022-02-04 04:22:13+00:00 [TERM="xterm" TTY="/dev/pts/0" COLUMNS="127" LINES="64"]
+# ./test_part1.sh -v
+Removing old myalloc binary.
+[32m>> Part 1: Testing initialization. (test_init_destroy)
+[0mInitializing arena:
+...requested size 1 bytes
+...pagesize is 4096 bytes
+...adjusting size with page boundaries
+...adjusted size is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7fadf11be000
+...arena ends at 0x7fadf11bf000
+...initializing header for initial free chunk
+...header size is 32 bytes
+[32mAssert 1 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+[32mAssert 2 passed!
+[0mInitializing arena:
+...requested size 8182 bytes
+...pagesize is 4096 bytes
+...adjusting size with page boundaries
+...adjusted size is 8192 bytes
+...mapping arena with mmap()
+...arena starts at 0x7fadf1190000
+...arena ends at 0x7fadf1192000
+...initializing header for initial free chunk
+...header size is 32 bytes
+[32mAssert 3 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+[32mAssert 4 passed!
+[0mInitializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7fadf11be000
+...arena ends at 0x7fadf11bf000
+...initializing header for initial free chunk
+...header size is 32 bytes
+[32mAssert 5 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+[32mAssert 6 passed!
+[0mInitializing arena:
+...requested size 18446744073709551615 bytes
+...error: requested size larger than MAX_ARENA_SIZE (2147483647)
+[32mAssert 7 passed!
+[0mDestroying Arena:
+...error: cannot destroy unintialized arena. Setting error status
+[32mAssert 8 passed!
+[0m# 
+
+Script done on 2022-02-04 04:22:20+00:00 [COMMAND_EXIT_CODE="0"]

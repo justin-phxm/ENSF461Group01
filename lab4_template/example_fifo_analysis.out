@@ -1,0 +1,25 @@
+Execution trace with FIFO:
+t=0: [Job 0] arrived at [0], ran for: [3]
+t=3: [Job 1] arrived at [0], ran for: [10]
+t=13: [Job 2] arrived at [0], ran for: [16]
+t=29: [Job 3] arrived at [0], ran for: [15]
+t=44: [Job 4] arrived at [0], ran for: [15]
+t=59: [Job 5] arrived at [0], ran for: [9]
+t=68: [Job 6] arrived at [0], ran for: [17]
+t=85: [Job 7] arrived at [0], ran for: [11]
+t=96: [Job 8] arrived at [0], ran for: [2]
+t=98: [Job 9] arrived at [0], ran for: [10]
+End of execution with FIFO.
+Begin analyzing FIFO:
+Job 0 -- Response time: 0  Turnaround: 3  Wait: 0
+Job 1 -- Response time: 3  Turnaround: 13  Wait: 3
+Job 2 -- Response time: 13  Turnaround: 29  Wait: 13
+Job 3 -- Response time: 29  Turnaround: 44  Wait: 29
+Job 4 -- Response time: 44  Turnaround: 59  Wait: 44
+Job 5 -- Response time: 59  Turnaround: 68  Wait: 59
+Job 6 -- Response time: 68  Turnaround: 85  Wait: 68
+Job 7 -- Response time: 85  Turnaround: 96  Wait: 85
+Job 8 -- Response time: 96  Turnaround: 98  Wait: 96
+Job 9 -- Response time: 98  Turnaround: 108  Wait: 98
+Average -- Response: 49.50  Turnaround 60.30  Wait 49.50
+End analyzing FIFO.

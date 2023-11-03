@@ -1,0 +1,62 @@
+Script started on 2022-02-04 04:33:16+00:00 [TERM="xterm" TTY="/dev/pts/0" COLUMNS="127" LINES="64"]
+# ./test_part4.sh -v
+Removing old myalloc binary.
+[32m>> Testing basic allocation free placement. (test_allocationfree_placement)
+[0mInitializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7fc1aed4d000
+...arena ends at 0x7fc1aed4e000
+...initializing header for initial free chunk
+...header size is 32 bytes
+Allocating memory:
+...looking for free chunk of >= 32 bytes
+...found free chunk of 4064 bytes with header at 0x7fc1aed4d000
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting free chunk
+...updating chunk header at 0x7fc1aed4d000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7fc1aed4d020
+[32mAssert 1 passed!
+[0m[32mAssert 2 passed!
+[0mHeader->size: 32
+Header->fwd: 0x7fc1aed4d040
+Header->bwd: (nil)
+Header->is_free: 0
+Allocating memory:
+...looking for free chunk of >= 32 bytes
+...found free chunk of 4000 bytes with header at 0x7fc1aed4d040
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to 0x7fc1aed4d000
+...checking if splitting is required
+...splitting free chunk
+...updating chunk header at 0x7fc1aed4d040
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7fc1aed4d060
+Freeing allocated memory:
+...supplied pointer 0x7fc1aed4d020:
+...being careful with my pointer arthimetic and void pointer casting
+...accessing chunk header at 0x7fc1aed4d000
+...chunk of size 32
+...checking if coalescing is needed
+...coalescing not needed.
+Allocating memory:
+...looking for free chunk of >= 32 bytes
+...found free chunk of 32 bytes with header at 0x7fc1aed4d000
+...free chunk->fwd currently points to 0x7fc1aed4d040
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting not required
+...updating chunk header at 0x7fc1aed4d000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7fc1aed4d020
+[32mAssert 3 passed!
+[0m[32mAssert 4 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+# 
+
+Script done on 2022-02-04 04:33:23+00:00 [COMMAND_EXIT_CODE="0"]

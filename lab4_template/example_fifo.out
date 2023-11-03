@@ -1,0 +1,12 @@
+Execution trace with FIFO:
+t=0: [Job 0] arrived at [0], ran for: [3]
+t=3: [Job 1] arrived at [0], ran for: [10]
+t=13: [Job 2] arrived at [0], ran for: [16]
+t=29: [Job 3] arrived at [0], ran for: [15]
+t=44: [Job 4] arrived at [0], ran for: [15]
+t=59: [Job 5] arrived at [0], ran for: [9]
+t=68: [Job 6] arrived at [0], ran for: [17]
+t=85: [Job 7] arrived at [0], ran for: [11]
+t=96: [Job 8] arrived at [0], ran for: [2]
+t=98: [Job 9] arrived at [0], ran for: [10]
+End of execution with FIFO.

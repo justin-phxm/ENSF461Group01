@@ -1,0 +1,13 @@
+Execution trace with SJF:
+t=0: [Job 10] arrived at [0], ran for: [10]
+t=10: [Job 9] arrived at [0], ran for: [11]
+t=21: [Job 8] arrived at [0], ran for: [12]
+t=33: [Job 7] arrived at [0], ran for: [13]
+t=46: [Job 6] arrived at [0], ran for: [14]
+t=60: [Job 5] arrived at [0], ran for: [15]
+t=75: [Job 4] arrived at [0], ran for: [16]
+t=91: [Job 3] arrived at [0], ran for: [17]
+t=108: [Job 2] arrived at [0], ran for: [18]
+t=126: [Job 1] arrived at [0], ran for: [19]
+t=145: [Job 0] arrived at [0], ran for: [20]
+End of execution with SJF.

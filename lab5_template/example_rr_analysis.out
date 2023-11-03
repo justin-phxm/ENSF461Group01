@@ -1,0 +1,14 @@
+Execution trace with RR:
+t=0: [Job 0] arrived at [0], ran for: [1]
+t=1: [Job 1] arrived at [1], ran for: [2]
+t=3: [Job 2] arrived at [3], ran for: [2]
+t=5: [Job 1] arrived at [1], ran for: [2]
+t=7: [Job 2] arrived at [3], ran for: [2]
+t=9: [Job 1] arrived at [1], ran for: [1]
+End of execution with RR.
+Begin analyzing RR:
+Job 0 -- Response time: 0  Turnaround: 1  Wait: 0
+Job 1 -- Response time: 0  Turnaround: 9  Wait: 4
+Job 2 -- Response time: 0  Turnaround: 6  Wait: 2
+Average -- Response: 0.00  Turnaround 5.33  Wait 2.00
+End analyzing RR.

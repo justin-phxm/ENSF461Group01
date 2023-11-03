@@ -1,0 +1,75 @@
+Script started on 2022-02-04 04:22:47+00:00 [TERM="xterm" TTY="/dev/pts/0" COLUMNS="127" LINES="64"]
+# ./test_part2.sh -v
+Removing old myalloc binary.
+[32m>> Testing allocations without the possibility to split. No Frees. (test_allocation_basic)
+[0mError: Unitialized. Setting status code
+[32mAssert 1 passed!
+[0m[32mAssert 2 passed!
+[0mInitializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7fc3c155e000
+...arena ends at 0x7fc3c155f000
+...initializing header for initial free chunk
+...header size is 32 bytes
+Allocating memory:
+...looking for free chunk of >= 4096 bytes
+...no such free chunk exists
+...setting error code
+[32mAssert 3 passed!
+[0m[32mAssert 4 passed!
+[0mAllocating memory:
+...looking for free chunk of >= 4064 bytes
+...found free chunk of 4064 bytes with header at 0x7fc3c155e000
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting not required
+...updating chunk header at 0x7fc3c155e000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7fc3c155e020
+[32mAssert 5 passed!
+[0m[32mAssert 6 passed!
+[0mAllocating memory:
+...looking for free chunk of >= 1 bytes
+...no such free chunk exists
+...setting error code
+[32mAssert 7 passed!
+[0m[32mAssert 8 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+[32m>>Testing frees without coalescing. (test_free_basic)
+[0mInitializing arena:
+...requested size 4096 bytes
+...pagesize is 4096 bytes
+...mapping arena with mmap()
+...arena starts at 0x7f9eafbff000
+...arena ends at 0x7f9eafc00000
+...initializing header for initial free chunk
+...header size is 32 bytes
+Allocating memory:
+...looking for free chunk of >= 4064 bytes
+...found free chunk of 4064 bytes with header at 0x7f9eafbff000
+...free chunk->fwd currently points to (nil)
+...free chunk->bwd currently points to (nil)
+...checking if splitting is required
+...splitting not required
+...updating chunk header at 0x7f9eafbff000
+...being careful with my pointer arthimetic and void pointer casting
+...allocation starts at 0x7f9eafbff020
+[32mAssert 1 passed!
+[0mFreeing allocated memory:
+...supplied pointer 0x7f9eafbff020:
+...being careful with my pointer arthimetic and void pointer casting
+...accessing chunk header at 0x7f9eafbff000
+...chunk of size 4064
+...checking if coalescing is needed
+...coalescing not needed.
+[32mAssert 2 passed!
+[0m[32mAssert 3 passed!
+[0mDestroying Arena:
+...unmapping arena with munmap()
+# 
+
+Script done on 2022-02-04 04:22:55+00:00 [COMMAND_EXIT_CODE="0"]
