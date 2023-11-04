@@ -22,15 +22,16 @@ typedef struct
 
 typedef struct
 {
-    // unsigned int vpn;
+    unsigned int vpn;
     unsigned int pfn;
     int valid; // validity bit: can be 0 (invalid) or 1 (valid)
-    unsigned long int r1, r2;
 } Page_table_entry;
 
 typedef struct
 {
-    Page_table_entry entries[4];
+    Page_table_entry *entries;
+    unsigned long int r1, r2;
+
 } Page_table;
 
 // Output file
@@ -44,7 +45,7 @@ unsigned int size_offset, size_ppn, size_vpn, current_pid = 0;
 unsigned long int **physical_memory = NULL;
 unsigned long int r1 = 0, r2 = 0;
 TLB_entry TLB[TLB_SIZE];
-Page_table pt;
+Page_table pt[4];
 
 // Function prototypes
 void initialize_TLB();
@@ -178,7 +179,14 @@ int main(int argc, char *argv[])
                 {
                     add();
                 }
-
+                else if (strcmp(tokens[0], "map") == 0)
+                {
+                    map(atoi(tokens[1]), atoi(tokens[2]));
+                }
+                else if (strcmp(tokens[0], "unmap") == 0)
+                {
+                    unmap(atoi(tokens[1]));
+                }
                 else
                 {
                     fprintf(output_file, "Error: Unknown instruction...\n");
@@ -260,12 +268,20 @@ void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_p
 }
 
 // Initialize Page Table
-void initialize_Page_table()
+void initialize_Page_table(unsigned int num_vpn_bits)
 {
+    int numVirtualPages = pow(2, num_vpn_bits);
     for (int i = 0; i < 4; i++)
     {
-        pt.entries[i].pfn = 0;
-        pt.entries[i].valid = 0;
+        pt[i].entries = (Page_table_entry *)malloc(numVirtualPages * sizeof(Page_table_entry));
+        pt[i].r1 = 0;
+        pt[i].r2 = 0;
+        for (int j = 0; j < numVirtualPages; j++)
+        {
+            pt[i].entries[j].valid = 0;
+            pt[i].entries[j].pfn = 0;
+            pt[i].entries[j].vpn = 0;
+        }
     }
 }
 
@@ -285,7 +301,7 @@ void define(unsigned int num_offset_bits, unsigned int num_ppn_bits, unsigned in
     initialize_physical_memory(num_offset_bits, num_ppn_bits);
     fprintf(output_file, "OFF bits: %d. PFN bits: %d. VPN bits: %d\n", num_offset_bits, num_ppn_bits, num_vpn_bits);
     initialize_TLB();
-    initialize_Page_table();
+    initialize_Page_table(num_vpn_bits);
 
     size_offset = num_offset_bits;
     size_ppn = num_ppn_bits;
@@ -301,16 +317,44 @@ void ctxswitch(unsigned int pid)
         return;
     }
     // Save contents from old process
-    pt.entries[current_pid].r1 = r1;
-    pt.entries[current_pid].r2 = r2;
+    pt[current_pid].r1 = r1;
+    pt[current_pid].r2 = r2;
 
     // Load contents from new process
     current_pid = pid;
-    r1 = pt.entries[pid].r1;
-    r2 = pt.entries[pid].r2;
+    r1 = pt[pid].r1;
+
+    r2 = pt[pid].r2;
     fprintf(output_file, "Current PID: %d. Switched execution context to process: %d\n", pid, pid);
 }
 
+void map(unsigned int vpn, unsigned int ppn)
+{
+    int numVirtualPageNumbers = pow(2, size_vpn);
+    for (int i = 0; i < numVirtualPageNumbers; i++)
+    {
+        if (pt[current_pid].entries[i].valid == 0)
+        {
+            pt[current_pid].entries[i].vpn = vpn;
+            pt[current_pid].entries[i].pfn = ppn;
+            fprintf(output_file, "Mapped virtual page number %d to physical frame number %d\n", vpn, ppn);
+            return;
+        }
+    }
+}
+void unmap(unsigned int vpn)
+{
+    int numVirtualPageNumbers = pow(2, size_vpn);
+    for (int i = 0; i < numVirtualPageNumbers; i++)
+    {
+        if (pt[current_pid].entries[i].vpn == vpn)
+        {
+            pt[current_pid].entries[i].valid = 0;
+            fprintf(output_file, "Unmapped virtual page number %d\n", vpn);
+            return;
+        }
+    }
+}
 void add()
 {
     unsigned long int sum = r1 + r2;
