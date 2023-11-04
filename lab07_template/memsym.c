@@ -331,6 +331,18 @@ void ctxswitch(unsigned int pid)
 void map(unsigned int vpn, unsigned int ppn)
 {
     int numVirtualPageNumbers = pow(2, size_vpn);
+
+    // check if vpn already exists in page table
+    for (int i = 0; i < numVirtualPageNumbers; i++)
+    {
+        if (pt[current_pid].entries[i].vpn == vpn && pt[current_pid].entries[i].valid == 1)
+        {
+            pt[current_pid].entries[i].pfn = ppn;
+            fprintf(output_file, "Mapped virtual page number %d to physical frame number %d\n", vpn, ppn);
+            return;
+        }
+    }
+
     for (int i = 0; i < numVirtualPageNumbers; i++)
     {
         if (pt[current_pid].entries[i].valid == 0)
