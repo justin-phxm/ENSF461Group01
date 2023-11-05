@@ -58,6 +58,7 @@ void map(unsigned int vpn, unsigned int ppn);
 void unmap(unsigned int vpn);
 void pinspect(unsigned int vpn);
 TLB_entry tinspect(unsigned int tlbn);
+void rinspect(char *reg);
 void load(char *dst, char *src);
 void add();
 // void store(unsigned int dst, unsigned int src);
@@ -197,6 +198,9 @@ int main(int argc, char *argv[])
                 else if (strcmp(tokens[0], "store") == 0)
                 {
                     store(atoi(tokens[1]), tokens[2]);
+                }
+                else if (strcmp(tokens[0], "rinspect") == 0) {
+                    rinspect(tokens[1]);
                 }
                 else
                 {
@@ -532,6 +536,18 @@ void store(unsigned int dst, char *src)
     else
     {
         fprintf(output_file, "Error: invalid register operand %s\n", src);
+        exit(1);
+    }
+    return;
+}
+
+void rinspect(char* reg) {
+    if (strcmp(reg, "r1") == 0) {
+        fprintf(output_file, "Inspected register %s. Content: %ld\n", reg, r1);
+    } else if (strcmp(reg, "r2") == 0) {
+        fprintf(output_file, "Inspected register %s. Content: %ld\n", reg, r2);
+    } else {
+        fprintf(output_file, "Error: invalid register operand %s\n", reg);
         exit(1);
     }
     return;
