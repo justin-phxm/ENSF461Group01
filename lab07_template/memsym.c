@@ -68,7 +68,7 @@ void store(unsigned int dst, char *src);
 void initialize_TLB();
 void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_ppn_bits);
 void cleanup_physical_memory();
-unsigned int VPN_to_PFN_address_translation(unsigned int vpn, unsigned int offset);
+unsigned int VPN_to_PFN_address_translation(unsigned long int vpn);
 void add_TLB_entry(unsigned int vpn, unsigned int ppn);
 void remove_TLB_entry(unsigned int vpn);
 
@@ -199,7 +199,8 @@ int main(int argc, char *argv[])
                 {
                     store(atoi(tokens[1]), tokens[2]);
                 }
-                else if (strcmp(tokens[0], "rinspect") == 0) {
+                else if (strcmp(tokens[0], "rinspect") == 0)
+                {
                     rinspect(tokens[1]);
                 }
                 else
@@ -237,8 +238,7 @@ void load(char *dst, char *src)
     if (strcmp(possibleHash, "#") == 0)
     {
         // Move src to the right by 1
-        src = src + 1;
-        int immediate = atoi(src);
+        int immediate = atoi(src + 1);
         if (strcmp(dst, "r1") == 0)
         {
             r1 = immediate;
@@ -261,7 +261,7 @@ void load(char *dst, char *src)
         virtualAddress = atoi(src);
 
         // Check the TLB for the physical address
-        unsigned int physicalAddress = VPN_to_PFN_address_translation(virtualAddress, 0);
+        unsigned int physicalAddress = VPN_to_PFN_address_translation(virtualAddress);
         if (strcmp(dst, "r1") == 0)
         {
             r1 = physical_memory[physicalAddress][0];
@@ -278,9 +278,6 @@ void load(char *dst, char *src)
             exit(1);
         }
     }
-
-    // If src is a memory location, add to TLB
-    // add_TLB_entry(src, src);
 }
 
 // Initialize TLB entries
@@ -351,7 +348,6 @@ void cleanup_physical_memory(int size)
 }
 
 void add_TLB_entry(unsigned int vpn, unsigned int ppn)
-
 {
     if (strcmp(strategy, "FIFO") == 0)
     {
@@ -403,30 +399,51 @@ void remove_TLB_entry(unsigned int vpn)
     }
 };
 
-unsigned int VPN_to_PFN_address_translation(unsigned int vpn, unsigned int offset)
+unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
 {
     fprintf(output_file, "Translating. ");
+    unsigned long int physicalAddress = 0;
+    unsigned long int vpnBits = (vpn >> size_offset) << size_offset; // Extract the vpn bits
+    unsigned long int offsetBits = (vpn - vpnBits);
+    physicalAddress |= offsetBits; // physical address contains the offset bits of vpn
 
-    // Temp solution
+    // search in TLB for vpn to pfn translation
     for (int i = 0; i < TLB_SIZE; i++)
     {
-        if (TLB[i].valid == 1 && TLB[i].pid == current_pid)
+        if (TLB[i].vpn == (vpnBits >> size_offset) && TLB[i].valid == 1)
         {
-            fprintf(output_file, "Lookup for VPN %d hit in TLB entry %d. PFN is %d\nCurrent PID: %d. ", TLB[i].vpn, i, TLB[i].ppn, current_pid);
-            return TLB[i].ppn;
+            fprintf(output_file, "Lookup for VPN %ld hit in TLB entry %ld. PFN is %ld\n", vpn, i, TLB[i].ppn);
+            physicalAddress |= TLB[i].ppn; // Find the ppn bits
+            return physicalAddress;
         }
     }
-    // Check if vpn is in TLB
+
+    // search in Page table for vpn to pfn translation
+    fprintf(output_file, "Lookup for VPN %ld caused a TLB miss\n", vpn);
+    for (int j = 0; j < pow(2, size_vpn); j++)
+    {
+        if (pt[current_pid].entries[j].vpn == (vpnBits >> size_offset) && pt[current_pid].entries[j].valid == 1)
+        {
+            fprintf(output_file, "Successfully mapped VPN %ld to PFN %ld\n", vpn, pt[current_pid].entries[j].pfn);
+            physicalAddress |= pt[current_pid].entries[j].pfn;
+            add_TLB_entry(vpnBits, pt[current_pid].entries[j].pfn);
+            return physicalAddress;
+        }
+    }
+
+    // If not found in page table, throw error
+    fprintf(output_file, "Translation for VPN %ld not found in page table\n", vpn);
+    exit(1);
+
+    // Temp solution
     // for (int i = 0; i < TLB_SIZE; i++)
     // {
-    //     if (TLB[i].vpn == vpn && TLB[i].valid == 1)
+    //     if (TLB[i].valid == 1 && TLB[i].pid == current_pid)
     //     {
-    //         fprintf(output_file, "Lookup for VPN %d hit in TLB entry %d. PFN is %d\n", vpn, i, TLB[i].ppn);
+    //         fprintf(output_file, "Lookup for VPN %d hit in TLB entry %d. PFN is %d\nCurrent PID: %d. ", TLB[i].vpn, i, TLB[i].ppn, current_pid);
     //         return TLB[i].ppn;
     //     }
     // }
-
-    // Handle cache miss
 
     return 0;
 }
@@ -515,38 +532,56 @@ void add()
     fprintf(output_file, "Added contents of registers r1 (%ld) and r2 (%ld). Result: %ld\n", r1, r2, sum);
     r1 = sum;
 }
-// void store(unsigned int dst, unsigned int src)
-// {
-//     return;
-// }
 
 void store(unsigned int dst, char *src)
 {
-    unsigned int physicalAddress = VPN_to_PFN_address_translation(dst, 0);
-    if (strcmp(src, "r1") == 0)
+    unsigned int physicalAddress = VPN_to_PFN_address_translation(dst);
+
+    char possibleHash[2];
+    possibleHash[0] = src[0];
+    possibleHash[1] = '\0';
+
+    // If src is an immediate
+    if (strcmp(possibleHash, "#") == 0)
     {
-        fprintf(output_file, "Stored value of register %s (%ld) into location %d\n", src, r1, dst);
-        physical_memory[physicalAddress][0] = r1;
+        int immediate = atoi(src + 1);
+        // physical_memory[physicalAddress][0] = immediate;
+        fprintf(output_file, "Stored immediate %d into location %d\n", immediate, dst);
     }
-    else if (strcmp(src, "r2") == 0)
-    {
-        fprintf(output_file, "Stored value of register %s (%ld) into location %d\n", src, r2, dst);
-        physical_memory[physicalAddress][0] = r2;
-    }
-    else
-    {
-        fprintf(output_file, "Error: invalid register operand %s\n", src);
-        exit(1);
-    }
+    // If src is a register
+    // else
+    // {
+    //     if (strcmp(src, "r1") == 0)
+    //     {
+    //         fprintf(output_file, "Stored value of register %s (%ld) into location %d\n", src, r1, dst);
+    //         physical_memory[physicalAddress][0] = r1;
+    //     }
+    //     else if (strcmp(src, "r2") == 0)
+    //     {
+    //         fprintf(output_file, "Stored value of register %s (%ld) into location %d\n", src, r2, dst);
+    //         physical_memory[physicalAddress][0] = r2;
+    //     }
+    //     else
+    //     {
+    //         fprintf(output_file, "Error: invalid register operand %s\n", src);
+    //         exit(1);
+    //     }
+    // }
     return;
 }
 
-void rinspect(char* reg) {
-    if (strcmp(reg, "r1") == 0) {
+void rinspect(char *reg)
+{
+    if (strcmp(reg, "r1") == 0)
+    {
         fprintf(output_file, "Inspected register %s. Content: %ld\n", reg, r1);
-    } else if (strcmp(reg, "r2") == 0) {
+    }
+    else if (strcmp(reg, "r2") == 0)
+    {
         fprintf(output_file, "Inspected register %s. Content: %ld\n", reg, r2);
-    } else {
+    }
+    else
+    {
         fprintf(output_file, "Error: invalid register operand %s\n", reg);
         exit(1);
     }
