@@ -412,7 +412,7 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
     {
         if (TLB[i].vpn == (vpnBits >> size_offset) && TLB[i].valid == 1)
         {
-            fprintf(output_file, "Lookup for VPN %ld hit in TLB entry %ld. PFN is %ld\n", vpn, i, TLB[i].ppn);
+            fprintf(output_file, "Lookup for VPN %ld hit in TLB entry %d. PFN is %d\n", vpn, i, TLB[i].ppn);
             physicalAddress |= TLB[i].ppn; // Find the ppn bits
             return physicalAddress;
         }
@@ -424,7 +424,7 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
     {
         if (pt[current_pid].entries[j].vpn == (vpnBits >> size_offset) && pt[current_pid].entries[j].valid == 1)
         {
-            fprintf(output_file, "Successfully mapped VPN %ld to PFN %ld\n", vpn, pt[current_pid].entries[j].pfn);
+            fprintf(output_file, "Successfully mapped VPN %ld to PFN %d\n", vpn, pt[current_pid].entries[j].pfn);
             physicalAddress |= pt[current_pid].entries[j].pfn;
             add_TLB_entry(vpnBits, pt[current_pid].entries[j].pfn);
             return physicalAddress;
