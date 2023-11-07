@@ -263,9 +263,9 @@ void load(char *dst, char *src)
 
         // Check the TLB for the physical address
         unsigned int physicalAddress = VPN_to_PFN_address_translation(virtualAddress);
-        unsigned int ppn = physicalAddress>>size_offset;
-        unsigned int offset = physicalAddress - (ppn<<size_offset);
-        fprintf(output_file, "ppn: %d, offset: %d\n", ppn, offset);
+        unsigned int ppn = physicalAddress >> size_offset;
+        unsigned int offset = physicalAddress - (ppn << size_offset);
+        // fprintf(output_file, "ppn: %d, offset: %d\n", ppn, offset);
         if (strcmp(dst, "r1") == 0)
         {
             r1 = physical_memory[ppn][offset];
@@ -311,8 +311,7 @@ void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_p
     }
 
     // Initialize each word in memory to 0
-
-    for (int i = 0; i < num_ppn_bits; i++)
+    for (int i = 0; i < numPages; i++)
     {
         physical_memory[i] = (unsigned long int *)calloc(pageSize, sizeof(unsigned long int));
         if (physical_memory[i] == NULL)
@@ -393,7 +392,7 @@ void add_TLB_entry(unsigned int vpn, unsigned int ppn)
 
 void remove_TLB_entry(unsigned int vpn)
 {
-    for (int i = TLB_SIZE-1; i >= 0; i--)
+    for (int i = TLB_SIZE - 1; i >= 0; i--)
     {
         if (TLB[i].vpn == vpn)
         {
@@ -408,11 +407,11 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
     fprintf(output_file, "Translating. ");
     unsigned long int physicalAddress = 0;
     unsigned long int vpnBits = (vpn >> size_offset); // Extract the vpn bits
-    unsigned long int offsetBits = (vpn - (vpnBits<<size_offset));
+    unsigned long int offsetBits = (vpn - (vpnBits << size_offset));
     // physicalAddress |= offsetBits; // physical address contains the offset bits of vpn
 
     // search in TLB for vpn to pfn translation
-    for (int i = TLB_SIZE-1 ; i >= 0; i--)
+    for (int i = TLB_SIZE - 1; i >= 0; i--)
     {
         if (TLB[i].vpn == (vpnBits) && TLB[i].valid == 1 && TLB[i].pid == current_pid)
         {
@@ -420,13 +419,13 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
             // physicalAddress |= TLB[i].ppn; // Find the ppn bits
             physicalAddress |= (TLB[i].ppn << size_offset);
             physicalAddress |= offsetBits;
-            fprintf(output_file, "Pppn: %ld\n", physicalAddress>>size_offset);
+            // fprintf(output_file, "Pppn: %ld\n", physicalAddress >> size_offset);
             return physicalAddress;
         }
     }
 
     // search in Page table for vpn to pfn translation
-    fprintf(output_file, "Lookup for VPN %ld caused a TLB miss\n", vpnBits);
+    fprintf(output_file, "Lookup for VPN %ld caused a TLB miss\nCurrent PID: %d. ", vpnBits, current_pid);
     for (int j = 0; j < pow(2, size_vpn); j++)
     {
         if (pt[current_pid].entries[j].vpn == (vpnBits) && pt[current_pid].entries[j].valid == 1)
@@ -440,7 +439,7 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
     }
 
     // If not found in page table, throw error
-    fprintf(output_file, "Translation for VPN %ld not found in page table\n", vpnBits);
+    fprintf(output_file, "Translating. Translation for VPN %ld not found in page table\n", vpnBits);
     exit(1);
 
     // Temp solution
@@ -544,8 +543,8 @@ void add()
 void store(unsigned int dst, char *src)
 {
     unsigned int physicalAddress = VPN_to_PFN_address_translation(dst);
-    unsigned int ppn = physicalAddress>>size_offset;
-    unsigned int offset = physicalAddress - (ppn<<size_offset);
+    unsigned int ppn = physicalAddress >> size_offset;
+    unsigned int offset = physicalAddress - (ppn << size_offset);
 
     char possibleHash[2];
     possibleHash[0] = src[0];
@@ -556,16 +555,13 @@ void store(unsigned int dst, char *src)
     {
         int immediate = atoi(src + 1);
 
-        // physical_memory[ppn][offset] = immediate;
-        fprintf(output_file, "ppn: %d, offset: %d\n", ppn, offset);
-        fprintf(output_file, "size: %d\n", physical_memory[ppn][0]);
+        physical_memory[ppn][offset] = immediate;
         fprintf(output_file, "Stored immediate %d into location %d\n", immediate, dst);
-
     }
     // If src is a register
     else
     {
-        
+
         if (strcmp(src, "r1") == 0)
         {
             fprintf(output_file, "Stored value of register %s (%ld) into location %d\n", src, r1, dst);
