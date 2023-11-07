@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <math.h>
 
 typedef struct
 {
@@ -153,21 +154,38 @@ int *SEQ(int *ints, int size)
 // Return the result of Hillis/Steele, but with each pass executed sequentially
 int *HSS(int *ints, int size)
 {
-    int *prefixScan = (int *)malloc(size * sizeof(int));
-
     // Initialize prefixScan and other arrays
+    int **intermediateArrays = (int **)malloc(log2(size) * sizeof(int *));
 
-    // Split the input array into two halves
+    // Initialize step 0
+    intermediateArrays[0] = (int *)malloc(size * sizeof(int));
+    intermediateArrays[0][0] = ints[0];
+    for (int i = 1; i < size; i++)
+    {
+        intermediateArrays[0][i] = ints[i] + ints[i - 1];
+    }
 
-    // Create auxiliary arrays for the prefix scan
+    // Initialize other steps
+    for (int i = 1; i < log2(size); i++)
+    {
+        intermediateArrays[i] = (int *)malloc(size * sizeof(int));
 
-    // Perform parallel prefix scan using multithreading or parallel processing
+        // Copy the previous step
+        for (int j = 0; j < pow(2, i); j++)
+        {
+            intermediateArrays[i][j] = intermediateArrays[i - 1][j];
+        }
 
-    // Combine the results from both halves to get the final prefix scan result
+        // Calculate the current step
+        for (int j = pow(2, i); j < size; j++)
+        {
+            intermediateArrays[i][j] = intermediateArrays[i - 1][j] + intermediateArrays[i - 1][j - (int)pow(2, i)];
+        }
+    }
 
     // Return the prefixScan array
-
-    return prefixScan;
+    // return prefixScan;
+    return intermediateArrays[(int)log2(size) - 1];
 }
 // Return the result of Hillis/Steele, parallelized using pthread
 int *HSP(int *ints, int size, int numthreads)
@@ -209,6 +227,7 @@ int main(int argc, char **argv)
     else if (strcmp(mode, "HSP") == 0)
     {
         result = HSP(ints, size, num_threads);
+        fprintf(output, "%d", result[0]);
     }
     else
     {
