@@ -46,7 +46,7 @@ char *strategy;
 // Global variables
 unsigned int size_offset, size_ppn, size_vpn, current_pid = 0;
 unsigned long int **physical_memory = NULL;
-unsigned long int r1 = 0, r2 = 0;
+unsigned long int r1 = 0, r2 = 0, time = 0;
 TLB_entry TLB[TLB_SIZE];
 Page_table pt[PAGE_TABLE_SIZE];
 
@@ -57,14 +57,14 @@ void ctxswitch(unsigned int pid);
 void map(unsigned int vpn, unsigned int ppn);
 void unmap(unsigned int vpn);
 void pinspect(unsigned int vpn);
-TLB_entry tinspect(unsigned int tlbn);
 void rinspect(char *reg);
 void load(char *dst, char *src);
 void add();
-// void store(unsigned int dst, unsigned int src);
 void store(unsigned int dst, char *src);
+void linspect(unsigned int pl);
+void tinspect(unsigned int tlbn);
 
-// unsigned long int linspect();
+// helper functions
 void initialize_TLB();
 void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_ppn_bits);
 void cleanup_physical_memory();
@@ -151,6 +151,7 @@ int main(int argc, char *argv[])
         // for example, 1.2.in is 4 6 6
         if (strcmp(tokens[0], "%") != 0)
         {
+            time++;
             if (strcmp(tokens[0], "ctxswitch") != 0)
             {
                 fprintf(output_file, "Current PID: %d. ", current_pid);
@@ -169,7 +170,6 @@ int main(int argc, char *argv[])
             }
             else
             {
-
                 if (strcmp(tokens[0], "define") == 0)
                 {
                     fprintf(output_file, "Error: multiple calls to define in the same trace\n");
@@ -203,6 +203,18 @@ int main(int argc, char *argv[])
                 {
                     rinspect(tokens[1]);
                 }
+                else if (strcmp(tokens[0], "pinspect") == 0)
+                {
+                    pinspect(atoi(tokens[1]));
+                }
+                else if (strcmp(tokens[0], "linspect") == 0)
+                {
+                    linspect(atoi(tokens[1]));
+                }
+                else if (strcmp(tokens[0], "tinspect") == 0)
+                {
+                    tinspect(atoi(tokens[1]));
+                }
                 else
                 {
                     fprintf(output_file, "Error: Unknown instruction...\n");
@@ -214,7 +226,6 @@ int main(int argc, char *argv[])
         // Deallocate tokens
         for (int i = 0; tokens[i] != NULL; i++)
         {
-            // fprintf(output_file, "%s\n", tokens[i]);
             free(tokens[i]);
         }
         free(tokens);
@@ -300,6 +311,7 @@ void initialize_TLB()
 void initialize_physical_memory(unsigned int num_offset_bits, unsigned int num_ppn_bits)
 {
     fprintf(output_file, "Memory instantiation complete. ");
+
     int numPages = pow(2, num_ppn_bits);
     int pageSize = pow(2, num_offset_bits);
 
@@ -354,19 +366,34 @@ void add_TLB_entry(unsigned int vpn, unsigned int ppn)
 {
     if (strcmp(strategy, "FIFO") == 0)
     {
-        // todo: implement FIFO strategy
         for (int i = 0; i < TLB_SIZE; i++)
         {
-            if (TLB[i].valid == 0)
+            if (((TLB[i].valid == 0) || (TLB[i].vpn == vpn)) && (TLB[i].pid == current_pid))
+            // if (TLB[i].valid == 0)
             {
                 TLB[i].vpn = vpn;
                 TLB[i].ppn = ppn;
                 TLB[i].valid = 1;
                 TLB[i].pid = current_pid;
-                // fprintf(output_file, "Lookup for VPN %ld hit in TLB entry %ld. PFN is %ld", vpn, i, ppn);
+                TLB[i].last_access_time = time;
                 return;
             }
         }
+        // If all entries are valid, replace the oldest entry
+        int oldest = 0;
+        for (int i = 0; i < TLB_SIZE; i++)
+        {
+            if (TLB[i].last_access_time < TLB[oldest].last_access_time)
+            {
+                oldest = i;
+            }
+        }
+        TLB[oldest].vpn = vpn;
+        TLB[oldest].ppn = ppn;
+        TLB[oldest].valid = 1;
+        TLB[oldest].pid = current_pid;
+        TLB[oldest].last_access_time = time;
+        return;
     }
     else if (strcmp(strategy, "LRU") == 0)
     {
@@ -378,9 +405,25 @@ void add_TLB_entry(unsigned int vpn, unsigned int ppn)
                 TLB[i].vpn = vpn;
                 TLB[i].ppn = ppn;
                 TLB[i].valid = 1;
-                // fprintf(output_file, "Lookup for VPN %ld hit in TLB entry %ld. PFN is %ld", vpn, i, ppn);
+                TLB[i].pid = current_pid;
+                TLB[i].last_access_time = time;
                 return;
             }
+            // If all entries are valid, replace the least recently used entry
+            int lru = 0;
+            for (int i = 0; i < TLB_SIZE; i++)
+            {
+                if (TLB[i].last_access_time < TLB[lru].last_access_time)
+                {
+                    lru = i;
+                }
+            }
+            TLB[lru].vpn = vpn;
+            TLB[lru].ppn = ppn;
+            TLB[lru].valid = 1;
+            TLB[lru].pid = current_pid;
+            TLB[lru].last_access_time = time;
+            return;
         }
     }
     else
@@ -411,7 +454,8 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
     // physicalAddress |= offsetBits; // physical address contains the offset bits of vpn
 
     // search in TLB for vpn to pfn translation
-    for (int i = TLB_SIZE - 1; i >= 0; i--)
+    for (int i = 0; i < TLB_SIZE; i++)
+    // for (int i = TLB_SIZE - 1; i >= 0; i--)
     {
         if (TLB[i].vpn == (vpnBits) && TLB[i].valid == 1 && TLB[i].pid == current_pid)
         {
@@ -420,6 +464,10 @@ unsigned int VPN_to_PFN_address_translation(unsigned long int vpn)
             physicalAddress |= (TLB[i].ppn << size_offset);
             physicalAddress |= offsetBits;
             // fprintf(output_file, "Pppn: %ld\n", physicalAddress >> size_offset);
+            if (strcmp(strategy, "LRU") == 0)
+            {
+                TLB[i].last_access_time = time;
+            }
             return physicalAddress;
         }
     }
@@ -514,6 +562,7 @@ void map(unsigned int vpn, unsigned int ppn)
         {
             pt[current_pid].entries[i].vpn = vpn;
             pt[current_pid].entries[i].pfn = ppn;
+            pt[current_pid].entries[i].valid = 1;
             fprintf(output_file, "Mapped virtual page number %d to physical frame number %d\n", vpn, ppn);
             return;
         }
@@ -528,6 +577,7 @@ void unmap(unsigned int vpn)
         if (pt[current_pid].entries[i].vpn == vpn)
         {
             pt[current_pid].entries[i].valid = 0;
+            pt[current_pid].entries[i].pfn = 0;
             fprintf(output_file, "Unmapped virtual page number %d\n", vpn);
             return;
         }
@@ -596,5 +646,23 @@ void rinspect(char *reg)
         fprintf(output_file, "Error: invalid register operand %s\n", reg);
         exit(1);
     }
+    return;
+}
+void pinspect(unsigned int vpn)
+{
+    fprintf(output_file, "Inspected page table entry %d. ", vpn);
+    fprintf(output_file, "Physical frame number: %d. Valid: %d\n", pt[current_pid].entries[vpn].pfn, pt[current_pid].entries[vpn].valid);
+}
+void linspect(unsigned int pl)
+{
+    unsigned int ppn = pl >> size_offset;
+    unsigned int offset = pl - (ppn << size_offset);
+
+    fprintf(output_file, "Inspected physical location %d. Value: %ld\n", pl, physical_memory[ppn][offset]);
+    return;
+}
+void tinspect(unsigned int tlbn)
+{
+    fprintf(output_file, "Inspected TLB entry %d. VPN: %d. PFN: %d. Valid: %d. PID: %d. Timestamp: %d\n", tlbn, TLB[tlbn].vpn, TLB[tlbn].ppn, TLB[tlbn].valid, TLB[tlbn].pid, TLB[tlbn].last_access_time);
     return;
 }
