@@ -188,10 +188,117 @@ int *HSS(int *ints, int size)
     return intermediateArrays[(int)log2(size) - 1];
 }
 // Return the result of Hillis/Steele, parallelized using pthread
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+typedef struct
+{
+    int *array;
+    int *sums;
+    int size;
+    int thread_id;
+    int num_threads;
+    pthread_barrier_t *barrier;
+} ThreadData;
+
+void *prefixSum(void *arg)
+{
+    ThreadData *data = (ThreadData *)arg;
+    int *arr = data->array;
+    int *sums = data->sums;
+    int size = data->size;
+    int thread_id = data->thread_id;
+    int num_threads = data->num_threads;
+    pthread_barrier_t *barrier = data->barrier;
+
+    int start = thread_id * (size / num_threads);
+    int end = (thread_id + 1) * (size / num_threads);
+    if (thread_id == num_threads - 1)
+    {
+        end = size;
+    }
+
+    for (int stride = 1; stride < size; stride *= 2)
+    {
+        int prev_sum = thread_id > 0 ? sums[thread_id - 1] : 0;
+        for (int i = start; i < end; i++)
+        {
+            if (i >= stride)
+            {
+                arr[i] += arr[i - stride] + prev_sum;
+            }
+        }
+
+        // Update sums array
+        sums[thread_id] = arr[end - 1];
+        if (thread_id > 0)
+        {
+            sums[thread_id] += sums[thread_id - 1];
+        }
+
+        pthread_barrier_wait(barrier);
+    }
+
+    pthread_exit(NULL);
+}
+
 int *HSP(int *ints, int size, int numthreads)
 {
     int *prefixScan = (int *)malloc(size * sizeof(int));
-    parallel_scan(prefixScan, size, numthreads);
+    int *sums = (int *)malloc(numthreads * sizeof(int));
+    if (prefixScan == NULL || sums == NULL)
+    {
+        perror("Malloc failed");
+        return NULL;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        prefixScan[i] = ints[i];
+    }
+
+    pthread_t threads[numthreads];
+    ThreadData threadData[numthreads];
+    pthread_barrier_t barrier;
+
+    pthread_barrier_init(&barrier, NULL, numthreads);
+    for (int i = 0; i < numthreads; i++)
+    {
+        sums[i] = 0;
+    }
+
+    for (int i = 0; i < numthreads; i++)
+    {
+        threadData[i].array = prefixScan;
+        threadData[i].sums = sums;
+        threadData[i].size = size;
+        threadData[i].thread_id = i;
+        threadData[i].num_threads = numthreads;
+        threadData[i].barrier = &barrier;
+
+        if (pthread_create(&threads[i], NULL, prefixSum, (void *)&threadData[i]))
+        {
+            perror("pthread_create failed");
+            free(prefixScan);
+            free(sums);
+            return NULL;
+        }
+    }
+
+    for (int i = 0; i < numthreads; i++)
+    {
+        if (pthread_join(threads[i], NULL))
+        {
+            perror("pthread_join failed");
+            free(prefixScan);
+            free(sums);
+            return NULL;
+        }
+    }
+
+    pthread_barrier_destroy(&barrier);
+    free(sums);
 
     return prefixScan;
 }
@@ -227,7 +334,6 @@ int main(int argc, char **argv)
     else if (strcmp(mode, "HSP") == 0)
     {
         result = HSP(ints, size, num_threads);
-        fprintf(output, "%d", result[0]);
     }
     else
     {
