@@ -1,5 +1,0 @@
-Current PID: 0. Memory instantiation complete. OFF bits: 5. PFN bits: 6. VPN bits: 6
-Current PID: 0. Switched execution context to process: 0
-Current PID: 0. Mapped virtual page number 1 to physical frame number 1
-Current PID: 0. Loaded immediate 24 into register r1
-Current PID: 0. Error: Unknown instruction...
