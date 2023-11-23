@@ -3,98 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <math.h>
-
-typedef struct
-{
-    int *data;
-    int step;
-    int start;
-    int end;
-} thread_args;
-
-void *up_sweep_thread(void *arg)
-{
-    thread_args *args = (thread_args *)arg;
-    int start = args->start;
-    int end = args->end;
-    int step = args->step;
-
-    for (int i = start; i < end; i += step)
-    {
-        args->data[i + step - 1] += args->data[i + (step / 2) - 1];
-    }
-
-    pthread_exit(NULL);
-}
-
-void *down_sweep_thread(void *arg)
-{
-    thread_args *args = (thread_args *)arg;
-    int start = args->start;
-    int end = args->end;
-    int step = args->step;
-
-    for (int i = start; i < end; i += step)
-    {
-        int t = args->data[i + (step / 2) - 1];
-        args->data[i + (step / 2) - 1] = args->data[i + step - 1];
-        args->data[i + step - 1] += t;
-    }
-
-    pthread_exit(NULL);
-}
-
-void parallel_scan(int *data, int length, int num_threads)
-{
-    pthread_t threads[num_threads];
-    thread_args args[num_threads];
-
-    // Up-sweep phase
-    for (int d = 0; d < log2(length); ++d)
-    {
-        int step = pow(2, d + 1);
-        for (int i = 0; i < num_threads; ++i)
-        {
-            args[i].data = data;
-            args[i].step = step;
-            args[i].start = i * step;
-            args[i].end = fmin(length, (i + 1) * step);
-            if (pthread_create(&threads[i], NULL, up_sweep_thread, &args[i]))
-            {
-                fprintf(stderr, "Error creating thread\n");
-                exit(1);
-            }
-        }
-        for (int i = 0; i < num_threads; ++i)
-        {
-            pthread_join(threads[i], NULL);
-        }
-    }
-
-    data[length - 1] = 0; // Set last element to zero for exclusive scan
-
-    // Down-sweep phase
-    for (int d = log2(length) - 1; d >= 0; --d)
-    {
-        int step = pow(2, d + 1);
-        for (int i = 0; i < num_threads; ++i)
-        {
-            args[i].data = data;
-            args[i].step = step;
-            args[i].start = i * step;
-            args[i].end = fmin(length, (i + 1) * step);
-            if (pthread_create(&threads[i], NULL, down_sweep_thread, &args[i]))
-            {
-                fprintf(stderr, "Error creating thread\n");
-                exit(1);
-            }
-        }
-        for (int i = 0; i < num_threads; ++i)
-        {
-            pthread_join(threads[i], NULL);
-        }
-    }
-}
+FILE *output = NULL;
 
 // Parse a vector of integers from a file, one per line.
 // Return the number of integers parsed.
@@ -188,121 +97,83 @@ int *HSS(int *ints, int size)
     return intermediateArrays[(int)log2(size) - 1];
 }
 // Return the result of Hillis/Steele, parallelized using pthread
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-
 typedef struct
 {
     int *array;
-    int *sums;
     int size;
-    int thread_id;
-    int num_threads;
+    int stride;
+    int start;
     pthread_barrier_t *barrier;
 } ThreadData;
 
 void *prefixSum(void *arg)
 {
     ThreadData *data = (ThreadData *)arg;
-    int *arr = data->array;
-    int *sums = data->sums;
+    int *array = data->array;
     int size = data->size;
-    int thread_id = data->thread_id;
-    int num_threads = data->num_threads;
+    int stride = data->stride;
+    int start = data->start;
     pthread_barrier_t *barrier = data->barrier;
 
-    int start = thread_id * (size / num_threads);
-    int end = (thread_id + 1) * (size / num_threads);
-    if (thread_id == num_threads - 1)
+    int *intermediateArray = (int *)malloc(size * sizeof(int));
+    for (int j = 0; j < size; j++)
     {
-        end = size;
+        intermediateArray[j] = array[j];
     }
-
-    for (int stride = 1; stride < size; stride *= 2)
+    for (int i = 0; i < log2(size); i++)
     {
-        int prev_sum = thread_id > 0 ? sums[thread_id - 1] : 0;
-        for (int i = start; i < end; i++)
+        for (int j = start; j < size; j += stride)
         {
-            if (i >= stride)
+            if (j - (int)pow(2, i) >= 0)
             {
-                arr[i] += arr[i - stride] + prev_sum;
+                intermediateArray[j] = array[j] + array[j - (int)pow(2, i)];
             }
         }
-
-        // Update sums array
-        sums[thread_id] = arr[end - 1];
-        if (thread_id > 0)
+        pthread_barrier_wait(barrier);
+        for (int j = start; j < size; j += stride)
         {
-            sums[thread_id] += sums[thread_id - 1];
+            array[j] = intermediateArray[j];
         }
-
         pthread_barrier_wait(barrier);
     }
-
+    free(intermediateArray);
     pthread_exit(NULL);
 }
 
 int *HSP(int *ints, int size, int numthreads)
 {
-    int *prefixScan = (int *)malloc(size * sizeof(int));
-    int *sums = (int *)malloc(numthreads * sizeof(int));
-    if (prefixScan == NULL || sums == NULL)
-    {
-        perror("Malloc failed");
-        return NULL;
-    }
-
+    int *outputArray = (int *)malloc(size * sizeof(int));
+    // copy ints into outputArray
     for (int i = 0; i < size; i++)
     {
-        prefixScan[i] = ints[i];
+        outputArray[i] = ints[i];
     }
-
     pthread_t threads[numthreads];
-    ThreadData threadData[numthreads];
     pthread_barrier_t barrier;
-
     pthread_barrier_init(&barrier, NULL, numthreads);
+    ThreadData threadData[numthreads];
+    // Initialize Threads
     for (int i = 0; i < numthreads; i++)
     {
-        sums[i] = 0;
-    }
-
-    for (int i = 0; i < numthreads; i++)
-    {
-        threadData[i].array = prefixScan;
-        threadData[i].sums = sums;
+        threadData[i].start = i;
+        threadData[i].stride = numthreads;
+        threadData[i].array = outputArray;
         threadData[i].size = size;
-        threadData[i].thread_id = i;
-        threadData[i].num_threads = numthreads;
         threadData[i].barrier = &barrier;
 
-        if (pthread_create(&threads[i], NULL, prefixSum, (void *)&threadData[i]))
-        {
-            perror("pthread_create failed");
-            free(prefixScan);
-            free(sums);
-            return NULL;
-        }
+        pthread_create(&threads[i], NULL, prefixSum, (void *)&threadData[i]);
     }
 
+    // Join Threads
     for (int i = 0; i < numthreads; i++)
     {
-        if (pthread_join(threads[i], NULL))
-        {
-            perror("pthread_join failed");
-            free(prefixScan);
-            free(sums);
-            return NULL;
-        }
+        pthread_join(threads[i], NULL);
     }
 
     pthread_barrier_destroy(&barrier);
-    free(sums);
 
-    return prefixScan;
+    return outputArray;
 }
-
 int main(int argc, char **argv)
 {
 
@@ -315,7 +186,7 @@ int main(int argc, char **argv)
     char *mode = argv[1];
     int num_threads = atoi(argv[2]);
     FILE *input = fopen(argv[3], "r");
-    FILE *output = fopen(argv[4], "w");
+    output = fopen(argv[4], "w");
 
     int *ints;
     int size;
